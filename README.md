@@ -1,2 +1,2 @@
-# Simple data
-My Data Science website at [luisvalesilva.github.io](http://luisvalesilva.github.io/index.html).
+# Data simple
+My Data Science website at [luisvalesilva.github.io/datasimple/](http://luisvalesilva.github.io/datasimple/).
