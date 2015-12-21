@@ -17,20 +17,19 @@
 	</head>
 	<body>
 
-		<!-- Header -->
-			<header id="header" class="skel-layers-fixed">
-				<h1><a href="index.html">Home</a></h1>
-			</header>
+	<!-- Header -->
+	<header id="header" class="skel-layers-fixed">
+		<h1><a href="index.html">Home</a></h1>
+	</header>
 
-		<!-- Main -->
-			<section id="main" class="wrapper">
-				<div class="container">
-          
-					<header class="major special">
-						<h4><b>November, 2015</b></h4>
-						<h2>Exploring NYC's CitiBike</h2>
-            <h3>Or how to make interactive maps with Python and Folium</h3>
-					</header>
+	<!-- Main -->
+	<section id="main" class="wrapper">
+		<div class="container">
+			<header class="major special">
+				<h4><b>November, 2015</b></h4>
+				<h2>Exploring NYC's CitiBike</h2>
+            			<h3>Or how to make interactive maps with Python and Folium</h3>
+			</header>
           <center>
             <p><font size="4" color="black">Full code on
               <font size="6"><a href="https://github.com/luisvalesilva/exploring_citibike" target="_blank" class="icon fa-github"></a></font></font>
@@ -40,12 +39,16 @@
           <p>CitiBike is the public bicycle sharing system serving New York City. The service opened
 			  in May 2013 and is currently the largest bike sharing program in the United States.
 			  A nice thing about it is that CitiBike share their data for anyone to play with.
-			  Here I will do just that, using Python. The following is a summarized description of the analysis,
-			  including data manipulation (with <a href="http://pandas.pydata.org/">Pandas</a>)
-			  and map visualizations (with <a href="http://folium.readthedocs.org/en/latest/">Folium</a>).
-			  You can find the full code in a Jupyter notebook on
-			  <a href="https://github.com/luisvalesilva/exploring_citibike">GitHub</a>.<br/><br/>
-			  CitiBike's data can be found on their
+			  Here I will do just that, using Python. The final goal is to build interactive
+			  visualizations of total trip counts and trip durations on maps of the citibike station network.
+			  The following is a summarized description of the analysis, including data manipulation
+			  (with <a href="http://pandas.pydata.org/">Pandas</a>) and map visualizations
+			  (with <a href="http://folium.readthedocs.org/en/latest/">Folium</a>). You can find the full
+			  code in a Jupyter notebook on <a href="https://github.com/luisvalesilva/exploring_citibike">GitHub</a>.</p>
+	  <header>
+	  	<h3>Preparing the data</h3>
+	  </header>
+	<p>CitiBike's data can be found on their
 			  <a href="https://www.citibikenyc.com/system-data" target="_blank">System Data website</a>.
 			  The data are organized in monthly subsets (each in its own <i>.csv</i> file)
 			  and are available since July 2013, soon after the citibike service opened.
@@ -55,10 +58,8 @@
 			  I will thus use all 2014 data, the only full year available so far. The data have been
 			  pre-cleaned before uploading, for example by removing trips taken by staff and any trips below 60
 			  seconds in length. This means they are ready to use, likely with little
-			  need for additional cleaning.</p>
-	          <header>
-	            <h3>Preparing the data</h3>
-	          </header>
+			  need for additional cleaning.</p><br/><br/>
+			  
 			  <p>The first step is to download the 12 <i>.csv</i> files for all months in 2014.
 				  We can read in the file names and then use a <i>for loop</i> to load the data as
 				  12 Pandas <i>DataFrames</i> appended to a list.</p>
