@@ -293,7 +293,7 @@ for index, row in start_station.iterrows():
 start_station_map.create_map(path = 'start_station_map.html')</code>
 		</pre></br>
           
-    	<p>And here is the final result. The maps show markers for all stations, each clickable
+    	<p>And here is the final result. The map shows markers for all stations, each clickable
 			to show the station name. Marker color is proportional to total trip counts
 			(color scale shown next to the maps) starting at the station. Marker size is
 			proportional to mean trip duration, from a minimum of 9.5 minutes up to
@@ -317,7 +317,7 @@ start_station_map.create_map(path = 'start_station_map.html')</code>
 
 		<p>This map lumps together all trips taken in 2014 for each station. Another interesting way
 			to look at the data is to compute trip counts per hour and see how they change during
-			the day. The following code prepares the data for that, additionally separating weekdays
+			the average day. The following code prepares the data for that, additionally separating weekdays
 			and weekends, as different use of CitiBike can be expected.
 		</p>
 		
@@ -354,12 +354,12 @@ legend = ax.legend(loc='upper left', frameon = False)</code>
 				</div>
 
 			<p>The plot shows that there are two clear commuting peaks on weekdays. On weekends
-				the use pattern is different, as expected, and there are less trips per hour.
+				the use pattern is different, as expected, and there are overall less trips per hour.
 				It would be interesting to visualize the dynamics of station use during the average weekday.
 				In order to do that, I can build hourly maps of station use for every hour using weekday data
-				and then use them to make a video illustrating the changes. The final result is a dynamic
-				visualization of how trip count (marker color) and trip duration (marker size) change
-				over the 24 hours on the average weekday.
+				and then use them to make a video illustrating the changes. The final result, shown hee below,
+				is a dynamic visualization of how trip count (marker color) and trip duration (marker size)
+				change over the 24 hours on the average weekday.
 			</p>
       
       <!-- Video -->
@@ -372,8 +372,8 @@ legend = ax.legend(loc='upper left', frameon = False)</code>
 
 			<p>This is it. I hope this gave you a little taste of how powerful Pandas is to manipulate data
 				and how easy Folium makes it to build interactive maps. Again, you can see the full code,
-				including the analyses shown here and more, in a Jupyter Notebook file in this
-				<a href="https://github.com/luisvalesilva/exploring_citibike" target="_blank">repo</a> on GitHub.
+				including the analyses shown here and more, in a Jupyter Notebook file in this GitHub
+				<a href="https://github.com/luisvalesilva/exploring_citibike" target="_blank">repo</a>.
 			</p>
       
 		</div>
