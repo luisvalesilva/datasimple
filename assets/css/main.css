@@ -1727,17 +1727,17 @@
 		margin: 0 0 2em 0;
 		padding: 0.5em 0 0.5em 2em;
 	}
-/* Removed to allow for prism.js and prism.css to take over
-	code {
+
+	code1 {
 		border-radius: 4px;
 		border-style: solid;
 		border-width: 1px;
 		font-family: "Courier New", monospace;
-		font-size: 1.2em;
+		font-size: 1em;
 		margin: 0 0.25em;
-		padding: 0.25em 0.65em;
+		padding: 0.25em 0.25em;
 	}
-
+/* Removed to allow for prism.js and prism.css to take over
 	pre {
 		-webkit-overflow-scrolling: touch;
 		font-family: "Courier New", monospace;
