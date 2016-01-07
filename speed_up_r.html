@@ -141,7 +141,7 @@ for (iter in 1:number_of_Ns) {
   # Time execution of task for current iteration's data size
   time <- system.time(
     for(row in 1:nrow(input)) {
-      result <- sqrt(input[row, ]) # Vectorized operation
+      result <- sqrt(input[row, ]) # Some operation (vectorized over columns)
       output_slow <- rbind(output_slow, result)
     }
   )
