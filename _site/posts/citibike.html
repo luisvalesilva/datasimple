@@ -19,7 +19,7 @@
   <!--[if lte IE 9]><link rel="stylesheet" href="/css/ie9.css" /><![endif]-->
   <link rel="alternate" type="application/rss+xml" title="Data Simple" href="http://luisvalesilva.github.io/datasimple/feed.xml">
   <!-- FavIcon -->
-  <link rel="icon" href="/images/datasimple_favicon.ico" type="image/x-icon">
+  <link rel="icon" href="//images/datasimple_favicon.ico" type="image/x-icon">
 
   <!-- Google Analytics -->
 		<script>
@@ -113,17 +113,17 @@ removing trips taken by staff and any trips below 60 seconds in length. This mea
 they are ready to use, likely with little need for additional cleaning.</p>
 
 <p>The first step is to download the 12 <em>.csv</em> files for all months in 2014. We can
-read in the file names and then use a <code>for loop</code> to load the data as 12 Pandas
+read in the file names and then use a <code class="highlighter-rouge">for loop</code> to load the data as 12 Pandas
 data frames appended to a list.</p>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">glob</span>
 <span class="c"># Get file names</span>
-<span class="n">filenames</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;*.csv&#39;</span><span class="p">)</span>
+<span class="n">filenames</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">'*.csv'</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="c"># Loop through file names and read the data</span>
 <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Reading &#39;</span> <span class="o">+</span> <span class="nb">file</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Reading '</span> <span class="o">+</span> <span class="nb">file</span><span class="p">)</span>
     <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="nb">file</span><span class="p">))</span></code></pre></figure>
 
 <p>Here’s a screenshot showing an example of what the data look like after loading in Pandas. You can see the included variables and two observations each for the August and the September data frames.</p>
@@ -134,23 +134,23 @@ data frames appended to a list.</p>
 </center>
 
 <p>Turns out the data are not as clean as I originally thought. The time stamps (variables
-<code>starttime</code>	and <code>stoptime</code>) are formatted in one way in months up to August and in
+<code class="highlighter-rouge">starttime</code>	and <code class="highlighter-rouge">stoptime</code>) are formatted in one way in months up to August and in
 a different way in the remaining months.	You can see examples in the screenshots above.
-One way to consolidate the format is to use Pandas’ <code>to_datetime</code> function to convert
-the variables to the appropriate data type (Pandas uses NumPy’s <code>datetime64</code>). A
-little <code>for loop</code> helps save some typing. For the months from September on I need
+One way to consolidate the format is to use Pandas’ <code class="highlighter-rouge">to_datetime</code> function to convert
+the variables to the appropriate data type (Pandas uses NumPy’s <code class="highlighter-rouge">datetime64</code>). A
+little <code class="highlighter-rouge">for loop</code> helps save some typing. For the months from September on I need
 to include information about the format, as it changes.</p>
 
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">print</span><span class="p">(</span><span class="s">&#39;Converting month:&#39;</span><span class="p">)</span>
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">print</span><span class="p">(</span><span class="s">'Converting month:'</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">month</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">month</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&#39;... &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">month</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
-        <span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">&#39;starttime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">&#39;starttime&#39;</span><span class="p">])</span>
-        <span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">&#39;stoptime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">&#39;stoptime&#39;</span><span class="p">])</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'... '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">month</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">'starttime'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">'starttime'</span><span class="p">])</span>
+        <span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">'stoptime'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">'stoptime'</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&#39;... &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">month</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
-        <span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">&#39;starttime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">&#39;starttime&#39;</span><span class="p">],</span> <span class="n">format</span> <span class="o">=</span> <span class="s">&#39;%m/</span><span class="si">%d</span><span class="s">/%Y %H:%M:%S&#39;</span><span class="p">)</span>
-        <span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">&#39;stoptime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">&#39;stoptime&#39;</span><span class="p">],</span> <span class="n">format</span> <span class="o">=</span> <span class="s">&#39;%m/</span><span class="si">%d</span><span class="s">/%Y %H:%M:%S&#39;</span><span class="p">)</span></code></pre></figure>
+        <span class="k">print</span><span class="p">(</span><span class="s">'... '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">month</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">'starttime'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">'starttime'</span><span class="p">],</span> <span class="n">format</span> <span class="o">=</span> <span class="s">'</span><span class="si">%</span><span class="s">m/</span><span class="si">%</span><span class="s">d/</span><span class="si">%</span><span class="s">Y </span><span class="si">%</span><span class="s">H:</span><span class="si">%</span><span class="s">M:</span><span class="si">%</span><span class="s">S'</span><span class="p">)</span>
+        <span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">'stoptime'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">dfs</span><span class="p">[</span><span class="n">month</span><span class="p">][</span><span class="s">'stoptime'</span><span class="p">],</span> <span class="n">format</span> <span class="o">=</span> <span class="s">'</span><span class="si">%</span><span class="s">m/</span><span class="si">%</span><span class="s">d/</span><span class="si">%</span><span class="s">Y </span><span class="si">%</span><span class="s">H:</span><span class="si">%</span><span class="s">M:</span><span class="si">%</span><span class="s">S'</span><span class="p">)</span></code></pre></figure>
 
 <p>Now that the timestamps are consistent, I can concatenate the datasets into one single
 data frame containing all data. Finally, I can use the pickle module (part of the
@@ -161,7 +161,7 @@ save and easily read back into memory at any point in the future.</p>
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c"># Concatenate DataFrames</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span>
 <span class="c"># Pickle data</span>
-<span class="n">df</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="s">&#39;citibike_2014.pkl&#39;</span><span class="p">)</span></code></pre></figure>
+<span class="n">df</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="s">'citibike_2014.pkl'</span><span class="p">)</span></code></pre></figure>
 
 <p>Let’s move on and get more familiar with the data. There are several rather high level
 questions we can quickly address to get an overview of the data. The code below shows
@@ -169,10 +169,10 @@ how to compute a few of them. The results show that our 2014 dataset includes <s
 observations of <strong>15</strong> variables. There were <strong>332</strong> CitiBike stations and <strong>6,811</strong>
 different bikes in use.</p>
 
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="s">&#39;citibike_2014.pkl&#39;</span><span class="p">)</span> <span class="c"># Read data</span>
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="s">'citibike_2014.pkl'</span><span class="p">)</span> <span class="c"># Read data</span>
 <span class="n">df</span><span class="o">.</span><span class="n">shape</span> <span class="c"># How many observations and variables are there</span>
-<span class="n">df</span><span class="p">[</span><span class="s">&#39;bikeid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span> <span class="c"># Number of individual bikes</span>
-<span class="n">df</span><span class="p">[</span><span class="s">&#39;start station id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span> <span class="c"># Number of citibike stations</span></code></pre></figure>
+<span class="n">df</span><span class="p">[</span><span class="s">'bikeid'</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span> <span class="c"># Number of individual bikes</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'start station id'</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span> <span class="c"># Number of citibike stations</span></code></pre></figure>
 
 <p>There are many ways we could go about exploring the data now. In this analysis I will
 be focusing on comparing the use of the different CitiBike stations in the network,
@@ -188,19 +188,19 @@ entire year of 2014.</p>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">matplotlib</span> <span class="kn">as</span> <span class="nn">mpl</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s">&#39;ggplot&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s">'ggplot'</span><span class="p">)</span>
 
 <span class="c"># Compute trip counts / day</span>
-<span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">&#39;starttime&#39;</span><span class="p">]</span> <span class="c"># Set &#39;starttime&#39; variable as the index</span>
-<span class="n">countsPerDay</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">starttime</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s">&#39;D&#39;</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;count&#39;</span><span class="p">])</span>
+<span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'starttime'</span><span class="p">]</span> <span class="c"># Set 'starttime' variable as the index</span>
+<span class="n">countsPerDay</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">starttime</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s">'D'</span><span class="p">,</span> <span class="n">how</span> <span class="o">=</span> <span class="p">[</span><span class="s">'count'</span><span class="p">])</span>
 
 <span class="c"># Plot trip counts</span>
-<span class="n">countsPerDay</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span> <span class="o">=</span> <span class="s">&#39;area&#39;</span><span class="p">,</span> <span class="n">stacked</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
-                  <span class="n">color</span> <span class="o">=</span> <span class="s">&#39;darkorange&#39;</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">legend</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="s">&#39;both&#39;</span><span class="p">,</span> <span class="n">which</span> <span class="o">=</span> <span class="s">&#39;major&#39;</span><span class="p">,</span> <span class="n">labelsize</span> <span class="o">=</span> <span class="mi">18</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&#39;Number of trips / day</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;Number of trips&#39;</span><span class="p">)</span></code></pre></figure>
+<span class="n">countsPerDay</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span> <span class="o">=</span> <span class="s">'area'</span><span class="p">,</span> <span class="n">stacked</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+                  <span class="n">color</span> <span class="o">=</span> <span class="s">'darkorange'</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">legend</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="s">'both'</span><span class="p">,</span> <span class="n">which</span> <span class="o">=</span> <span class="s">'major'</span><span class="p">,</span> <span class="n">labelsize</span> <span class="o">=</span> <span class="mi">18</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Number of trips / day</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">''</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Number of trips'</span><span class="p">)</span></code></pre></figure>
 
 <center>
 <img src="../images/citibike/daily_trip_counts.png" alt="Daily trip counts" style="width: 800px;" />
@@ -211,22 +211,22 @@ towards the Summer and a decrease thereafter, going back to harsher weather. Reg
 sharp decreases in daily trip counts are also clearly seen, corresponding to weekends
 and holidays.</p>
 
-<p>In order to visualize trip durations I can plot an histogram of the <code>tripduration</code>
+<p>In order to visualize trip durations I can plot an histogram of the <code class="highlighter-rouge">tripduration</code>
 variable. The histogram reveals that most trips are rather short,	with most frequent
 durations not longer than 10 minutes. Durations longer than 30 minutes are quite rare.
 Here I am excluding all trips with durations longer than 1 hour, representing rare outliers.</p>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c"># Collect all trips shorter than 1 hour</span>
-<span class="n">duration_mins</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">tripduration</span> <span class="o">/</span> <span class="mi">60</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">)][[</span><span class="s">&#39;tripduration&#39;</span><span class="p">]]</span>
+<span class="n">duration_mins</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">tripduration</span> <span class="o">/</span> <span class="mi">60</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">)][[</span><span class="s">'tripduration'</span><span class="p">]]</span>
 <span class="n">duration_mins</span> <span class="o">=</span> <span class="n">duration_mins</span> <span class="o">/</span> <span class="mi">60</span> <span class="c"># In minutes</span>
 
 <span class="c"># Plot the distribution of trip durations</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;font.size&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">})</span>
-<span class="n">duration_mins</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">bins</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#39;orange&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="s">&#39;both&#39;</span><span class="p">,</span> <span class="n">which</span> <span class="o">=</span> <span class="s">&#39;major&#39;</span><span class="p">,</span> <span class="n">labelsize</span> <span class="o">=</span> <span class="mi">18</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&#39;Distribution of trip durations</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;Duration (min.)&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;Trip counts&#39;</span><span class="p">)</span></code></pre></figure>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">'font.size'</span><span class="p">:</span> <span class="mi">16</span><span class="p">})</span>
+<span class="n">duration_mins</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">bins</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">'orange'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="s">'both'</span><span class="p">,</span> <span class="n">which</span> <span class="o">=</span> <span class="s">'major'</span><span class="p">,</span> <span class="n">labelsize</span> <span class="o">=</span> <span class="mi">18</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Distribution of trip durations</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Duration (min.)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Trip counts'</span><span class="p">)</span></code></pre></figure>
 
 <center>
 <img src="../images/citibike/hist_trip_duration.png" alt="Histogram trip duration" style="width: 550px;" />
@@ -239,18 +239,18 @@ of variables with information on trip start stations. I then drop duplicate stat
 observations, to keep only one row for each individual CitiBike station. Finally,
 I can compute total trip counts out of each station, as well as mean trip duration
 (using the original complete data frame). These values are stored in two new variables,
-<code>trip count</code> and <code>mean duration</code>, and added to the new data frame.</p>
+<code class="highlighter-rouge">trip count</code> and <code class="highlighter-rouge">mean duration</code>, and added to the new data frame.</p>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c"># Build a table containing the stations - one observation per station</span>
 <span class="n">start_station</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]]</span> <span class="c"># Keep only required variables</span>
-<span class="n">start_station</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">start_station</span><span class="p">[</span><span class="s">&#39;start station id&#39;</span><span class="p">]</span> <span class="c"># Index by start station id</span>
+<span class="n">start_station</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">start_station</span><span class="p">[</span><span class="s">'start station id'</span><span class="p">]</span> <span class="c"># Index by start station id</span>
 <span class="n">start_station</span> <span class="o">=</span> <span class="n">start_station</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span> <span class="c"># Keep only one row per station</span>
 
 <span class="c"># Compute trip counts and mean trip duration for each start station and add to table</span>
-<span class="n">count_start_station</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;start station id&#39;</span><span class="p">)[</span><span class="s">&#39;start station id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
-<span class="n">mean_start_station</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;start station id&#39;</span><span class="p">)[</span><span class="s">&#39;tripduration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<span class="n">start_station</span><span class="p">[</span><span class="s">&#39;trip count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">count_start_station</span>
-<span class="n">start_station</span><span class="p">[</span><span class="s">&#39;mean duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_start_station</span></code></pre></figure>
+<span class="n">count_start_station</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'start station id'</span><span class="p">)[</span><span class="s">'start station id'</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<span class="n">mean_start_station</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'start station id'</span><span class="p">)[</span><span class="s">'tripduration'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">start_station</span><span class="p">[</span><span class="s">'trip count'</span><span class="p">]</span> <span class="o">=</span> <span class="n">count_start_station</span>
+<span class="n">start_station</span><span class="p">[</span><span class="s">'mean duration'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_start_station</span></code></pre></figure>
 
 <p>I can now use Folium to make the interactive map of the station network. The map will
 include one marker for each station, with a color scale proportional to trip counts
@@ -263,24 +263,24 @@ so I will be using that instead.</p>
 <span class="kn">import</span> <span class="nn">matplotlib.cm</span> <span class="kn">as</span> <span class="nn">cm</span>
 
 <span class="c"># Normalize trip counts</span>
-<span class="n">norm</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="n">start_station</span><span class="p">[</span><span class="s">&#39;trip count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">start_station</span><span class="p">[</span><span class="s">&#39;trip count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">Normalize</span><span class="p">(</span><span class="n">start_station</span><span class="p">[</span><span class="s">'trip count'</span><span class="p">]</span><span class="o">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">start_station</span><span class="p">[</span><span class="s">'trip count'</span><span class="p">]</span><span class="o">.</span><span class="nb">max</span><span class="p">())</span>
 <span class="c"># Get dark tileset from CartoBD (https://cartodb.com/basemaps)</span>
-<span class="n">tileset</span> <span class="o">=</span> <span class="s">r&#39;http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png&#39;</span>
+<span class="n">tileset</span> <span class="o">=</span> <span class="s">r'http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'</span>
 <span class="c"># Build Folium map</span>
 <span class="n">start_station_map</span> <span class="o">=</span> <span class="n">folium</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="p">[</span><span class="mf">40.74</span><span class="p">,</span> <span class="o">-</span><span class="mf">73.99</span><span class="p">],</span> <span class="n">width</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
                                <span class="n">tiles</span> <span class="o">=</span> <span class="n">tileset</span><span class="p">,</span>
-                               <span class="n">attr</span> <span class="o">=</span> <span class="s">&#39;© OpenStreetMap contributors, © CartoDB&#39;</span><span class="p">,</span>
+                               <span class="n">attr</span> <span class="o">=</span> <span class="s">'© OpenStreetMap contributors, © CartoDB'</span><span class="p">,</span>
                                <span class="n">zoom_start</span> <span class="o">=</span> <span class="mi">12</span><span class="p">)</span>
 <span class="c"># Loop through rows (one per station) and compute marker color (trip counts) and size (trip duration)</span>
 <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">start_station</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-    <span class="n">color</span> <span class="o">=</span> <span class="n">rgb2hex</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">YlOrRd</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;trip count&#39;</span><span class="p">])))</span>
-    <span class="n">start_station_map</span><span class="o">.</span><span class="n">circle_marker</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;start station latitude&#39;</span><span class="p">],</span>
-                                                <span class="n">row</span><span class="p">[</span><span class="s">&#39;start station longitude&#39;</span><span class="p">]],</span>
-                                    <span class="n">popup</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;start station name&#39;</span><span class="p">],</span> <span class="c"># Add labels with station name</span>
-                                    <span class="n">radius</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;mean duration&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="n">rgb2hex</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">YlOrRd</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">'trip count'</span><span class="p">])))</span>
+    <span class="n">start_station_map</span><span class="o">.</span><span class="n">circle_marker</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s">'start station latitude'</span><span class="p">],</span>
+                                                <span class="n">row</span><span class="p">[</span><span class="s">'start station longitude'</span><span class="p">]],</span>
+                                    <span class="n">popup</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">'start station name'</span><span class="p">],</span> <span class="c"># Add labels with station name</span>
+                                    <span class="n">radius</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s">'mean duration'</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span>
                                     <span class="n">fill_color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="n">color</span><span class="p">)</span>
 <span class="c"># Create the final html document</span>
-<span class="n">start_station_map</span><span class="o">.</span><span class="n">create_map</span><span class="p">(</span><span class="n">path</span> <span class="o">=</span> <span class="s">&#39;start_station_map.html&#39;</span><span class="p">)</span></code></pre></figure>
+<span class="n">start_station_map</span><span class="o">.</span><span class="n">create_map</span><span class="p">(</span><span class="n">path</span> <span class="o">=</span> <span class="s">'start_station_map.html'</span><span class="p">)</span></code></pre></figure>
 
 <p>And here is the final result. The map shows markers for all stations, each clickable
 to show the station name. Marker color is proportional to total trip counts (color
@@ -303,26 +303,26 @@ during the average day. The following code prepares the data for that, additiona
 separating weekdays and weekends, as different use of CitiBike can be expected.</p>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c"># Calculate trip counts per hour on weekdays and weekends</span>
-<span class="n">df_sub</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s">&#39;tripduration&#39;</span><span class="p">,</span> <span class="s">&#39;starttime&#39;</span><span class="p">]]</span> <span class="c"># Keep only &#39;starttime&#39; and &#39;tripduration&#39; variables</span>
-<span class="c"># Index dataframe by &#39;datetime64&#39; data in &#39;starttime&#39; variable</span>
-<span class="n">df_sub</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df_sub</span><span class="p">[</span><span class="s">&#39;starttime&#39;</span><span class="p">]</span>
+<span class="n">df_sub</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s">'tripduration'</span><span class="p">,</span> <span class="s">'starttime'</span><span class="p">]]</span> <span class="c"># Keep only 'starttime' and 'tripduration' variables</span>
+<span class="c"># Index dataframe by 'datetime64' data in 'starttime' variable</span>
+<span class="n">df_sub</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">df_sub</span><span class="p">[</span><span class="s">'starttime'</span><span class="p">]</span>
 <span class="n">weekdays</span> <span class="o">=</span> <span class="n">df_sub</span><span class="p">[</span><span class="n">df_sub</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">weekday</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">]</span>
 <span class="n">weekends</span> <span class="o">=</span> <span class="n">df_sub</span><span class="p">[</span><span class="n">df_sub</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">weekday</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">]</span>
 <span class="n">weekdays_countsPerHr</span> <span class="o">=</span> <span class="n">weekdays</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">weekdays</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">hour</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
 <span class="n">weekends_countsPerHr</span> <span class="o">=</span> <span class="n">weekends</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">weekends</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">hour</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
 <span class="c"># Plot counts / hour on weekdays and weekends</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;font.size&#39;</span><span class="p">:</span> <span class="mi">18</span><span class="p">,</span> <span class="s">&#39;legend.fontsize&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">})</span>
-<span class="n">weekdays_countsPerHr</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span> <span class="o">=</span> <span class="s">&#39;area&#39;</span><span class="p">,</span> <span class="n">stacked</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#39;darkorange&#39;</span><span class="p">,</span>
-                          <span class="n">linewidth</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Weekdays&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">'font.size'</span><span class="p">:</span> <span class="mi">18</span><span class="p">,</span> <span class="s">'legend.fontsize'</span><span class="p">:</span> <span class="mi">20</span><span class="p">})</span>
+<span class="n">weekdays_countsPerHr</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span> <span class="o">=</span> <span class="s">'area'</span><span class="p">,</span> <span class="n">stacked</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">color</span> <span class="o">=</span> <span class="s">'darkorange'</span><span class="p">,</span>
+                          <span class="n">linewidth</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Weekdays'</span><span class="p">)</span>
 
-<span class="n">weekends_countsPerHr</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span> <span class="o">=</span> <span class="s">&#39;area&#39;</span><span class="p">,</span> <span class="n">stacked</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#39;darkred&#39;</span><span class="p">,</span>
-                          <span class="n">linewidth</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Weekends&#39;</span><span class="p">)</span>
+<span class="n">weekends_countsPerHr</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span> <span class="o">=</span> <span class="s">'area'</span><span class="p">,</span> <span class="n">stacked</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">'darkred'</span><span class="p">,</span>
+                          <span class="n">linewidth</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Weekends'</span><span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="s">&#39;both&#39;</span><span class="p">,</span> <span class="n">which</span> <span class="o">=</span> <span class="s">&#39;major&#39;</span><span class="p">,</span> <span class="n">labelsize</span> <span class="o">=</span> <span class="mi">18</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&#39;Number of trips / hour</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;Time of day (hr)&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;Number of trips&#39;</span><span class="p">)</span>
-<span class="n">legend</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">frameon</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span></code></pre></figure>
+<span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="s">'both'</span><span class="p">,</span> <span class="n">which</span> <span class="o">=</span> <span class="s">'major'</span><span class="p">,</span> <span class="n">labelsize</span> <span class="o">=</span> <span class="mi">18</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Number of trips / hour</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Time of day (hr)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Number of trips'</span><span class="p">)</span>
+<span class="n">legend</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">'upper left'</span><span class="p">,</span> <span class="n">frameon</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span></code></pre></figure>
 
 <center>
 <img src="../images/citibike/hourly_trip_counts.png" alt="Hourly trip counts" style="width: 550px;" />

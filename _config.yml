@@ -11,7 +11,7 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://luisvalesilva.github.io/datasimple" # the base hostname & protocol for your site
 permalink: posts/:title
 exclude: [drafts/]
-highlighter: pygments
+highlighter: rouge
 social:
   twitter: https://twitter.com/luisvalesilva
   github: https://github.com/luisvalesilva
