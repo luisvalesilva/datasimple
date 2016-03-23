@@ -1,0 +1,59 @@
+---
+layout: landing
+---
+				<!-- Banner -->
+					<section id="banner">
+						<div class="inner">
+							<h2>{{ site.title }}</h2>
+							<p>{{ site.description | markdownify }}</p>
+						</div>
+						<a href="#one" class="more scrolly">Learn More</a>
+					</section>
+
+				<!-- One -->
+					<section id="one" class="wrapper style1 special">
+						<div class="inner">
+							<header class="major">
+								<h2>Data Simple</h2>
+								<p>Data Simple is a blog-like collection of articles about<br />
+									Data Science, focusing heavily on Python and R.<br /><br />
+									Check out the posts highlighted here below or<br />
+									the full list at the bottom of the page.</p>
+							</header>
+						</div>
+					</section>
+
+				<!-- Two -->
+					<section id="two" class="wrapper alt style2">
+						<section class="spotlight">
+							<div class="image"><img src="images/pic01.png" alt="" /></div><div class="content">
+								<h2><a href="{% post_url 2015-11-05-citibike %}">Exploring NYC's Citibike</a></h2>
+								<p>Or how to make interactive maps with Python and Folium.</p>
+							</div>
+						</section>
+						<section class="spotlight">
+							<div class="image"><img src="images/pic02.jpg" alt="" /></div><div class="content">
+								<h2><a href="{% post_url 2015-12-18-speed-up-r %}">Not that slow, please</a></h2>
+								<p>Or how to speed up R code</p>
+							</div>
+						</section>
+					</section>
+
+				<!-- CTA -->
+					<section id="cta" class="wrapper style4">
+						<div class="inner">
+							<header>
+								<h2>All posts</h2>
+								<ul>
+									<li><p>December 2015 -	&nbsp;&nbsp;&nbsp; Speed up R code
+										&nbsp;&nbsp;&nbsp;&nbsp;
+									  <a href="{% post_url 2015-12-18-speed-up-r %}" class="icon fa-link"></a>
+	                </p></li>
+									<li><p>November 2015 -	&nbsp;&nbsp;&nbsp; Exploring NYC's CitiBike
+										&nbsp;&nbsp;&nbsp;&nbsp;
+									  <a href="{% post_url 2015-11-05-citibike %}" class="icon fa-link"></a>
+	                </p></li>
+							</ul>
+							</header>
+						</div>
+					</section>
