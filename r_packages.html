@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<!--
+	Based on the template 'Retrospect', by TEMPLATED
+	Template released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+
+	Content by Luis Vale Silva
+-->
+<html lang="en">
+	<head>
+		<title>Data simple - Writing R packages</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content="A code walk-through exemplifying some simple practices allowing
+		significant optimization of R code runtime.">
+		<meta name="keywords" content="data science, data visualization, r programming language, code optimization, computing speed, runtime">
+		<meta name="author" content="Luis Vale Silva">
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+		<link rel="icon" href="images/datasimple_favicon.ico" type="image/x-icon">
+		 <link rel="stylesheet" href="assets/css/prism.css">
+		 <script src="assets/js/prism.js"></script>
+
+		 <!-- Google Analytics -->
+		<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-71624249-1', 'auto');
+  ga('send', 'pageview');
+  </script>
+
+	</head>
+	<body>
+
+	<!-- Header -->
+	<header id="header" class="skel-layers-fixed">
+		<h1><a href="index.html">Home</a></h1>
+	</header>
+
+	<!-- Main -->
+	<section id="main" class="wrapper">
+		<div class="container">
+			<header class="major special">
+				<h4><b>May, 2016</b></h4>
+				<h2>Make it reproducible</h2>
+  			<h3>Or how to write your own R packages</h3>
+			</header>
+      <center>
+        <p><font size="4" color="black">Full code on
+          <font size="6"><a href="https://github.com/luisvalesilva/speed_up_r" target="_blank" class="icon fa-github"></a></font></font>
+        </p>
+      </center>
+      <br />
+      <p>In his book
+        <a href="http://adv-r.had.co.nz/Performance.html" target="_blank">Advanced R</a>, Hadley Wickham
+        put it like this:
+      </p>
+      <blockquote><i>R is not a fast language. This is not an accident. R was purposely designed to
+        make data analysis and statistics easier for you to do. It was not designed to make life easier
+        for your computer.</i></blockquote>
+
+      <p>This is a fact, not an opinion. Execution time may be more or less important to you, but
+        with R speed comes second to providing an high level framework for easy data analysis. That
+        being said, there is no reason why you should not design your code to avoid excedingly long
+        run times.
+      </p>
+
+      <pre>
+        <code class="language-r">
+# The mock input data: data frame with large number of rows (n)
+n <- 2000000
+input <- as.data.frame(cbind(rnorm(n, mean = 100, sd = 1),
+                             rnorm(n, mean = 100, sd = 1)))
+
+# Initialize data frame to collect outputs
+output <- as.data.frame(matrix(NA, nrow = 0, ncol = 2))
+
+# Loop through all rows, perform operation and 'rbind' output
+for(row in 1:nrow(input))) {
+  # Loop through all columns and perform operation
+  result <- sqrt(input[row, ])  # Some operation
+
+  # Collect result by 'rbind'ing to output data frame
+  output <- rbind(output, result)
+}</code>
+			</pre></br>
+
+
+      <p>As a final note, let me just add that if you liked this article you will love the <i>Performant
+        code</i> section of Hadley Wicham's <a href="http://adv-r.had.co.nz/" target="_blank">Advanced R</a>
+        book.
+      </p>
+
+		</div>
+  </section>
+  <!-- Footer -->
+  <footer id="footer">
+    <div class="inner">
+      <font size="1">
+        <ul class="copyright">
+          <li>&copy; Data simple</li>
+          <li></li><li></li>
+          <li>Design based on 'Retrospect' from <a href="http://templated.co" target="_blank" >TEMPLATED</a>.</li>
+        </ul></font>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/skel.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

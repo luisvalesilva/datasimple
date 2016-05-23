@@ -1,0 +1,18 @@
+Make it reproducible
+Or how to write your own R packages
+
+Pros and Cons
+
+See here: http://brooksandrew.github.io/simpleblog/articles/personal-R-package/
+
+
+Manuals
+There's an official manual at "Writing R extensions" (https://cran.r-project.org/doc/manuals/r-release/R-exts.html).
+Hadley Wickham published a book dedicated to writing R packages (http://r-pkgs.had.co.nz/), which for me is the
+definitive guide.
+
+How-to
+
+
+
+Publishing documentation
