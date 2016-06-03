@@ -5,11 +5,12 @@ Pros and Cons
 
 See here: http://brooksandrew.github.io/simpleblog/articles/personal-R-package/
 
-
 Manuals
 There's an official manual at "Writing R extensions" (https://cran.r-project.org/doc/manuals/r-release/R-exts.html).
 Hadley Wickham published a book dedicated to writing R packages (http://r-pkgs.had.co.nz/), which for me is the
 definitive guide.
+
+In this post I will give you a quick overview of how to use Hadley Wickham's tools to build your own R package, documentation website included.
 
 How-to
 
