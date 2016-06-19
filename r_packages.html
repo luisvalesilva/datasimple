@@ -185,6 +185,8 @@ b <- triple(2476937509, FALSE)</code>
 		<h4>3. Install the package</h4>
 		<p>That's it, your package is ready to use. You can use <code1>devtools</code1>
 			to install it, as follows, and then use it as you would any other R package.
+			Whenever you want to add functions to your package just go through steps 1.
+			and 2. above. As many times as you want.
 	</p>
 
 		<pre>
@@ -228,7 +230,7 @@ a <- Rpckg::triple(2476937509)</code>
 	<pre>
 		<code class="language-r">
 # As of this writing, staticdocs is not yet on CRAN; grab the development version
-devtools::install_github("h`adley/staticdocs")
+devtools::install_github("hadley/staticdocs")
 # Navigate to package's parent directory and build site
 setwd('location/of/your/package')
 staticdocs::build_site('Rpckg', '/website/location/')</code>
