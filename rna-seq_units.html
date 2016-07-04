@@ -1,0 +1,415 @@
+<!DOCTYPE HTML>
+<!--
+	Based on the template 'Retrospect', by TEMPLATED
+	Template released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+
+	Content by Luis Vale Silva
+-->
+<html lang="en">
+	<head>
+		<title>Data simple - RNA-seq units</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content="A code walk-through exemplifying some simple practices allowing
+		significant optimization of R code runtime.">
+		<meta name="keywords" content="data science, RNA-seq, bioinformatics, r programming, TPM, FPKM, RPKM, CPM">
+		<meta name="author" content="Luis Vale Silva">
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+		<link rel="icon" href="images/datasimple_favicon.ico" type="image/x-icon">
+		 <link rel="stylesheet" href="assets/css/prism.css">
+		 <script src="assets/js/prism.js"></script>
+
+		 <!-- Google Analytics -->
+		<script>
+  		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  	ga('create', 'UA-71624249-1', 'auto');
+  	ga('send', 'pageview');
+  	</script>
+
+		<!-- Mathjax -->
+		<script type="text/javascript" async
+			src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+		</script>
+
+	</head>
+	<body>
+
+	<!-- Header -->
+	<header id="header" class="skel-layers-fixed">
+		<h1><a href="index.html">Home</a></h1>
+	</header>
+
+	<!-- Main -->
+	<section id="main" class="wrapper">
+		<div class="container">
+			<header class="major special">
+				<h4><b>June 2016</b></h4>
+				<h2>On RNA-seq expression units</h2>
+  			<h3>Or why you should move on to using TPM</h3>
+			</header>
+      <br />
+			<p>RNA-seq is a wildly popular technique allowing sensitive differential gene
+				expression analysis. The typical RNA-seq experiment includes preparing mRNA
+				samples, fragmenting the mRNA molecules, reverse transcribing into cDNA,
+				and converting the sample into a molecular library. The output consists on
+				millions of reads, generated from the cDNA fragments in the sequenced sample.
+				The reads are then aligned to a reference genome or transcriptome, with the
+				ultimate goal of establishing a correspondence between the number of cDNA
+				fragments in the sample and the relative abundance of the underlying genomic
+				features (the genomic regions that can appear represented in the sample,
+				such as exons or genes).
+			</p>
+
+			<p>In practical terms, read counts depend on the relative expression of the
+				genomic feature (the target measurement), but also on other confounding
+				factors. Namely, read counts for each genomic feature depend heavily on
+				the total number of reads (sequencing depth) and the feature's length. The
+				dependence on read length may be surprising to you, as you might expect
+				the method to produce a number of reads proportional to the number of cDNA
+				molecules in the sample. The key is the fragmentation step referred above.
+				Since sequencing requires that the molecules are broken down into smaller
+				pieces, longer transcripts will yield a higher number of fragments and,
+				thus, a higher read count. Additionally, read counts are affected by transcriptome
+				and nucleotide composition.
+			</p>
+
+			<p> One other major problem is the ambiguous assignment of reads to different
+				gene isoforms, arising from alternative splicing events. Here I will be
+				ignoring that, however, to focus on the upstream challenge of establishing
+				an expression unit for RNA-seq that allows both within-sample and inter-sample
+				differential feature expression analysis. The community is still divided
+				when it comes to what expression unit to use, many years after the development
+				of the technique and at a time when it is routinely used in many research
+				labs and biotech companies around the world. I will go over the units and
+				the overall math behind them, as well as their implementation in the popular
+				gene expression analysis R and Bioconductor package
+				<a href="https://bioconductor.org/packages/release/bioc/html/edgeR.html" target="_blank">edgeR</a>.
+			</p>
+
+			<header>
+ 		  	<h3>Sample normalization factors</h3>
+ 		  </header>
+
+			<p>RNA-seq experiments generate relative, rather than absolute, measurements.
+				In order for any units to be comparable between samples or between experiments,
+				we need to perform inter-sample normalization. While feature expression
+				comparisons within samples need to account for all factors referred in the
+				second paragraph above, comparisons between samples need to be corrected
+				for differences in sequencing depth and transcriptome composition only.
+				Attributes like feature length and GC content (nucleotide composition) do
+				not vary and thus cancel out.
+			</p>
+
+			<p>How differences in sequencing depth affect read count is self explanatory.
+				The impact of transcriptome composition, on the other hand, can be understood
+				using the following example. Given some transcript present in two RNA-seq
+				samples with the same number of total reads (sequencing depth), if one sample
+				has a larger transcriptome, a smaller proportion of reads will pertain to
+				that transcript. Similarly, for samples with the same qualitative transcriptome
+				and sequenced at the same depth, if a subset of shared transcripts is more
+				highly expressed in the first sample it will make up a larger proportion
+				of the total pool and, therefore, the test feature will also receive a lower
+				proportion of the reads. Furthermore, the same total number of reads will
+				actually represent fewer transcripts.
+			</p>
+
+			<p>For this reason, the first step in the analysis of the final counts of
+				aligned reads (known as feature summarization data) is to account and correct
+				for such biases. The typical analysis of feature summarization data will
+				drop reads for features with counts below a certain threshold, calculate
+				sample normalization factors, and scale library sizes (sum of reads in each
+				sample) accordingly. This will address the biases brought about by differences
+				in sequencing depth and transcriptome composition. In the specific case
+				of edgeR, an empirical approach based on the trimmed mean of M values (TMM)
+				method is used, implemented in the function <code1>calcNormFactors</code1>.
+			</p>
+
+			<p>After sample normalization, expression units are chosen for inter-sample
+				and within-sample differential feature expression analysis. I will go over
+				the most popular units and discuss the fact that the most commonly used
+				unit for within-sample feature expression comparison has a better alternative
+				that should be used instead.</p>
+
+			<header>
+				<h3>CPM</h3>
+			</header>
+
+				<p>The simplest RNA-seq feature expression unit simply reports normalized
+					counts, or the number of reads that align to a particular feature after
+					correcting for sequencing depth and transcriptome composition bias. Counts
+					are the most popular unit among differential expression analysis methods
+					(including edgeR). However, feature length normalization is skipped, with
+					the important consequence that differential feature expression analysis
+					within samples is not possible.
+				</p>
+
+				<p>The resulting unit is <u>c</u>ounts </>p</u>er <u>m</u>illion fragments
+					mapped (CPM): for each feature \(i\), \(CPM\) is the count of sequenced
+					fragments mapping to the feature (the random variable I am calling \(r_i\)
+					here) scaled by the total number of reads (\(R\)) times one million (to
+					bring it up to a more convenient number).
+				</p>
+
+				<p>
+					$$ \text{CPM}_i = \dfrac{r_i}{\dfrac{R}{10^6}} = \dfrac{r_i}{R}\cdot 10^6 $$
+
+					With
+				</p>
+				<p> \( R = \sum_{j=1}^n r_j \)
+				</p>
+				<p>and
+				</p>
+				<p>\( n = \) number of represented features
+				</p>
+
+				<p>If we drop the multiplication by one million, \( CPM_i \) becomes simply
+					the number of reads mapping to feature \( i \) relative to the total number
+					of fragments in the sample and thus has the properties of relative counts:
+				</p>
+				<p>\( 0 \leq \dfrac{r_i}{R} \leq 1 \)
+					&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;&nbsp;&nbsp;&nbsp;
+					\( \sum_{i=1}^n \dfrac{r_i}{R} = 1 \)
+				</p>
+
+				<p>edgeR includes function <code1>cpm</code1> to compute this unit. It divides
+					every count in a sample (generated by feature summarization from SAM/BAM
+					alignment maps using
+					<a href="http://www-huber.embl.de/users/anders/HTSeq/doc/overview.html" target="_blank">HTSeq</a>
+					or <a href="http://bioinf.wehi.edu.au/featureCounts/" target="_blank">featureCounts</a>,
+					for example) by the total number of counts for that sample (library size
+					or, more correctly, mapped reads) multiplied by one million. Here's edgeR's
+					</code1>cpm<code1> (with code to get it in R).
+				</p>
+
+      <pre>
+        <code class="language-r">
+> edgeR::cpm.default
+
+function (x, lib.size = NULL, log = FALSE, prior.count = 0.25, ...)
+{
+    x <- as.matrix(x)
+    if (is.null(lib.size))
+        lib.size <- colSums(x)
+    if (log) {
+        prior.count.scaled <- lib.size/mean(lib.size) * prior.count
+        lib.size <- lib.size + 2 * prior.count.scaled
+    }
+    lib.size <- 1e-06 * lib.size
+    if (log)
+        log2(t((t(x) + prior.count.scaled)/lib.size))
+    else t(t(x)/lib.size)
+}</code>
+			</pre></br>
+
+			<p>The key part of their implementation can be written as
+				<code1>t(t(x)/(1e-06 * lib.size))</code1>. Feature counts are in matrix
+			</code1>x</code1>, in which every column is a sample and every row is a feature.
+			Total read counts for each sample are the column sums of the matrix, resulting
+			in vector <code1>lib.size</code1> of the same dimension as the number of columns
+			in the matrix. CPM is computed using a matrix-vector division.
+			</p>
+
+			<header>
+				<h3>RPKM/FPKM</h3>
+			</header>
+
+			<p>If CPM is appropriate for inter-sample comparison of feature expression,
+				within-sample counts must be normalized by feature length. The most commonly
+				used unit still is <u>r</u>eads <u>p</u>er <u>k</u>ilobase of transcript
+				per <u>m</u>illion fragments sequenced (RPKM), introduced with one of the
+				original RNA-seq papers
+				<a href="http://www.ncbi.nlm.nih.gov/pubmed/18516045" target="_blank">Mortazavi <i>et al.</i> Nature Methods, 2008</a>).
+				The alternative unit FPKM is nothing more than a generalization to deal
+				with the fact that, depending on the sequencing technology, a single sequenced
+				molecule can actually produce more than one read (as in paired-end sequencing
+				experiments, in which a read pair corresponds to a cDNA fragment). The word
+				'reads' in RPKM is replaced by 'fragments' in FPKM. RPKM (or FPKM) is defined
+				formally as follows: for each feature \(i\), \( RPKM \) is the count (the
+				random variable \( r_i \)) scaled by the feature's length (\( l_i \)) times
+				one thousand (to kilobase) and further scaled by the total number of reads
+				(\( R=\sum_{i=1}^n r_i \)) times one million (again, in order to bring it
+				up to a more convenient number).
+
+				$$ \text{RPKM}_i = \dfrac{r_i}{ \left(\dfrac{l_i}{10^3}\right) \left( \dfrac{R}{10^6} \right)} = \dfrac{r_i}{l_i R} \cdot 10^9 $$
+			</p>
+
+			<p>edgeR includes function <code1>rpkm</code1> to compute this unit. Since
+				RPKM actually builds on CPM by adding feature length normalization, edgeR's
+				implementation simply calculates RPKM by dividing each feature's CPM (variable
+				<code1>y</code1> in the code) by that feature's length multiplied by one
+				thousand. This adds feature length normalization to sequencing depth-normalized
+				counts.
+			</p>
+
+			<pre>
+				<code class="language-r">
+> edgeR::rpkm.default
+
+function (x, lib.size = NULL, log = FALSE, prior.count = 0.25, ...)
+{
+	y <- cpm.default(x = x, lib.size = lib.size, log = log, prior.count = prior.count, ...)
+	gene.length.kb <- gene.length/1000
+	if (log)
+		y - log2(gene.length.kb)
+	else y/gene.length.kb
+}</code>
+			</pre></br>
+
+			<header>
+				<h3>The inconsistency with the RPKM/FPKM unit</h3>
+			</header>
+
+			<p>However, RPKM should actually be avoided since it is inconsistent across
+				samples
+				(<a href="http://www.ncbi.nlm.nih.gov/pubmed/22872506" target="_blank">Wagner <i>et al.</i> Theory Biosci., 2012</a>).
+				The reason is explained by the following insight: the relationship between
+				the total number of reads (\( R \) in the equations) and the actual total
+				number of cDNA fragments sampled depends on the length distribution of mRNA
+				transcripts. RPKM  normalizes by the total number of reads and this is <b>not
+				a measure of total transcript number</b>: this relationship depends on the
+				length distribution of transcripts, which is variable between samples. To
+				put it bluntly, this normalization factor is variable across samples, hence
+				the statement that opens this paragraph: the resulting unit is inconsistent
+				across samples.
+			</p>
+
+			<p>Inter-feature differential expression within samples will still work. Running
+				the risk of upsetting the underlying message of this article, I will even
+				go as far as stating that even inter-sample RPKM comparisons will, in most
+				cases, be ok. In practical terms, since we typically look at thousands of
+				features and it is reasonable to assume that a majority of them will not
+				be differentially expressed between samples, we are probably not that far
+				off when using RPKM for inter-sample feature expression comparisons. We
+				can probably trust most conclusions drawn in such terms in the literature.
+			</p>
+
+			<p>The inconsistency is real and is there, though, so it needs fixing.
+			</p>
+
+			<header>
+				<h3>TPM is the solution (kind of...).</h3>
+			</header>
+
+			<p>From the explanation of RPKM's inconsistency above, a possible fix becomes apparent. Transcript length
+			distributions can vary between samples and that introduces an inconsistency in RPKM calculation. So,
+			instead of dividing by the total number of sequenced reads (\( R \)) for a given sample, we can instead
+			divide by the total number of length-normalized reads. This unit, <u>t</u>ranscripts <u>p</u>er
+			<u>m</u>illion fragments sequenced (TPM), was introduced originally in
+			<a href="https://www.ncbi.nlm.nih.gov/pubmed/20022975" target="_blank">Li <i>et al.</i> Bioinformatics, 2010</a>
+			 and further supported in
+			 <a href="http://www.ncbi.nlm.nih.gov/pubmed/22872506" target="_blank">Wagner <i>et al.</i> Theory Biosci., 2012</a>.
+			 Compare the TPM equation with CPM and RPKM's, re-arranjed here for direct comparison.
+
+			$$ \text{CPM}_i = \dfrac{r_i}{\sum_{j=1}^n r_j} \cdot 10^6 $$
+
+			$$ \text{RPKM}_i = \dfrac{r_i}{\sum_{j=1}^n r_j} \cdot \dfrac{1}{\dfrac{l_i}{10^3}} \cdot 10^6 $$
+
+			$$ \text{TPM}_i = \dfrac{r_i}{\sum_{j=1}^n \dfrac{r_j}{l_j}} \cdot \dfrac{1}{l_i} \cdot 10^6 $$
+			</p>
+
+			<p>TPM is the new iteration of RNA-seq units and the one that should be used
+				instead of RPKM/FPKM. The interpretation is that \( TPM_i \) represents
+				the number of transcripts of feature \(i \) found in a total number of one
+				million transcripts. Interestingly, we can easily convert RPKM values to
+				TPM by simply dividing the a feature's RPKM by the sum of the RPKM values
+				over all features and multiplying by one million.
+
+			$$ \begin{aligned} \text{TPM}_i &= \dfrac{\text{RPKM}_i}{\sum_{j=1}^n \text{RPKM}_j } \cdot 10^6 \end{aligned} $$
+			</p>
+
+			<header>
+				<h3>Calculating TPM</h3>
+			</header>
+
+			<p>Armed with this information, we can convert RPKM to TPM in two different
+				ways: from pre-calculated RPKM by diving by the sum of RPKM values, or directly
+				from the normalized counts. Below is example R code to calculate TPM from RPKM
+				values computed using edgeR's <code1>rpkm</code1> function.
+			</p>
+
+			<p>
+			</p>
+
+			<pre>
+				<code class="language-r">
+# Start from feature summarization data (as an edgeR DGEList object)
+# Filter-out low expression features, perform sample normalization and calculate RPKM
+y <- edgeR::calcNormFactors(y)
+y <- edgeR::rpkm(y)
+
+# Calculate TPM from RPKM
+tpm_from_rpkm <- function(x) {
+  rpkm.sum <- colSums(x)
+  return(t(t(x) / (1e-06 * rpkm.sum)))
+}
+
+tpm <- tpm_from_rpkm(y)</code>
+			</pre></br>
+
+			<p>And the following is a simple implementation of TPM computation starting
+				from edgeR-normalized counts.
+			</p>
+
+			<pre>
+				<code class="language-r">
+# Start from feature summarization data (as an edgeR DGEList object)
+# Filter-out low expression features and perform sample normalization
+y <- edgeR::calcNormFactors(y)
+
+# Calculate TPM from normalized counts
+calc_tpm <- function(x, gene.length) {
+    x <- as.matrix(x)
+    len.norm.lib.size <- colSums(x / gene.length)
+    return((t(t(x) / len.norm.lib.size) * 1e06) / gene.length)
+}
+
+tpm_man <- calc_tpm(y, gene.length = y$genes$Length)</code>
+			</pre></br>
+
+			<p>TPM accounts for the lengths of all transcripts found in the sample and
+				thus brings us one step closer to a good solution. This unit is more stable
+				across samples than RPKM. However, the abundances of all transcripts will
+				still change between samples, meaning that the denominator of the TPM equation
+				(sum of length-normalized read counts) is variable. This way, TPM is <b>not
+					directly comparable between experiments</b> either. Further research is needed...
+			</p>
+
+			<p>If you want to dive deeper in the subject of why TPM is a better unit than
+				RPKM/FPKM, two very informative resources (other than the papers I cited here
+				above) are the blog posts published by Prof. Lior Pachter in his blog,
+				<a href="https://liorpachter.wordpress.com/tag/tpm/" target="_blank">Bits of DNA</a>,
+				and by Prof. Pachter's student Harold Pimentel in his own blog,
+				<a href="https://haroldpimentel.wordpress.com/2014/05/08/what-the-fpkm-a-review-rna-seq-expression-units/" target="_blank">The Farago</a>.
+			</p>
+
+		</div>
+  </section>
+  <!-- Footer -->
+  <footer id="footer">
+    <div class="inner">
+      <font size="1">
+        <ul class="copyright">
+          <li>&copy; Data simple</li>
+          <li></li><li></li>
+	  <li>Hosted on <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.</li>
+          <li></li><li></li>
+          <li>Design based on 'Retrospect' from <a href="http://templated.co" target="_blank" >TEMPLATED</a>.</li>
+        </ul></font>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/skel.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>
