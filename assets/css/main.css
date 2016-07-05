@@ -105,7 +105,8 @@
 
 		.container.\31 25\25 {
 			width: 100%;
-			max-width: 100em;
+			/* max-width: 100em; */
+			max-width: 1000px;
 			min-width: 80em;
 		}
 
@@ -131,7 +132,8 @@
 
 		.container.\31 25\25 {
 			width: 100%;
-			max-width: 81.25em;
+			/* max-width: 81.25em; */
+			max-width: 1000px;
 			min-width: 65em;
 		}
 
