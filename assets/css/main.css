@@ -81,10 +81,8 @@
 
 	.container.\31 25\25 {
 		width: 100%;
-		/* max-width: 100em; */
-		max-width: 60em;
-		/* min-width: 80em; */
-		min-width: 60em;
+		max-width: 100em;
+		min-width: 80em;
 	}
 
 	.container.\37 5\25 {
@@ -107,10 +105,8 @@
 
 		.container.\31 25\25 {
 			width: 100%;
-			/* max-width: 100em; */
-			max-width: 60em;
-			/* min-width: 80em; */
-			min-width: 60em;
+			max-width: 100em;
+			min-width: 80em;
 		}
 
 		.container.\37 5\25 {
@@ -135,10 +131,8 @@
 
 		.container.\31 25\25 {
 			width: 100%;
-			/* max-width: 81.25em; */
-			max-width: 60em;
-			/* min-width: 65em; */
-			min-width: 60em;
+			max-width: 81.25em;
+			min-width: 65em;
 		}
 
 		.container.\37 5\25 {
