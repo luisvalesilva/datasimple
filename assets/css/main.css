@@ -81,8 +81,10 @@
 
 	.container.\31 25\25 {
 		width: 100%;
-		max-width: 100em;
-		min-width: 80em;
+		/* max-width: 100em; */
+		max-width: 60em;
+		/* min-width: 80em; */
+		min-width: 60em;
 	}
 
 	.container.\37 5\25 {
