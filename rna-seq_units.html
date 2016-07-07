@@ -217,29 +217,29 @@ function (x, lib.size = NULL, log = FALSE, prior.count = 0.25, ...)
 				<h3>RPKM/FPKM</h3>
 			</header>
 
-			<p>If CPM is appropriate for inter-sample comparison of feature expression,
-				within-sample counts must additionally be normalized by feature length.
-				The most commonly used unit is <u>r</u>eads <u>p</u>er <u>k</u>ilobase of
-				transcript per <u>m</u>illion reads mapped (RPKM), introduced with one of the
-				original RNA-seq papers
-				<a href="http://www.ncbi.nlm.nih.gov/pubmed/18516045" target="_blank">Mortazavi <i>et al.</i> Nature Methods, 2008</a>).
-				The alternative unit FPKM is nothing more than a generalization to deal
-				with the fact that, depending on the sequencing technology, a single sequenced
-				molecule, or fragment, can actually produce more than one read. This currently
-				refers to paired-end sequencing experiments, in which a read pair, rather
-				than a single read, corresponds	to a cDNA fragment. The word 'reads' in RPKM
-				is replaced by 'fragments' in FPKM. RPKM (or FPKM) is defined formally as
-				follows: for each feature \(i\), \( RPKM \) is the count (the	random variable
-				\( r_i \)) scaled by the feature's length (\( l_i \)) times	one thousand
-				(to kilobase) and further scaled by the total number of reads	(\( R=\sum_{i=1}^n r_i \))
-				times one million (again, in order to bring it up to a more convenient number).
+			<p>If CPM is appropriate for inter-sample comparison, within-sample comparisons
+				must account for differences in feature length. The most commonly used unit
+				in this case is <u>r</u>eads <u>p</u>er <u>k</u>ilobase of transcript per
+				<u>m</u>illion reads mapped (RPKM), introduced with one of the original
+				RNA-seq papers
+				(<a href="http://www.ncbi.nlm.nih.gov/pubmed/18516045" target="_blank">Mortazavi <i>et al.</i> Nature Methods, 2008</a>).
+				The alternative unit FPKM is nothing more than a generalization to deal	with
+				the fact that, depending on the sequencing technology, a single sequenced
+				cDNA fragment can actually produce more than one read. This currently refers
+				to paired-end sequencing experiments, in which a read pair corresponds
+				to a cDNA fragment. The word 'reads' in RPKM is replaced by 'fragments' in
+				FPKM. RPKM (or FPKM) is defined formally for each feature \(i\) as the count
+				(the	random variable	\( r_i \)) scaled by the feature's length (\( l_i \))
+				times	one thousand (to kilobase) and further scaled by the total number of
+				reads	(\( R=\sum_{i=1}^n r_i \)) times one million (again, in order to bring
+				it up to a more convenient number).
 
 				$$ \text{RPKM}_i = \dfrac{r_i}{ \left(\dfrac{l_i}{10^3}\right) \left( \dfrac{R}{10^6} \right)} = \dfrac{r_i}{l_i R} \cdot 10^9 $$
 			</p>
 
 			<p>edgeR includes function <code1>rpkm</code1> to compute this unit. Since
 				RPKM actually builds on CPM by adding feature length normalization, edgeR's
-				implementation simply calculates RPKM by dividing each feature's CPM (variable
+				implementation calculates RPKM by simply dividing each feature's CPM (variable
 				<code1>y</code1> in the code) by that feature's length multiplied by one
 				thousand. This adds feature length normalization to sequencing depth-normalized
 				counts.
@@ -263,46 +263,44 @@ function (x, lib.size = NULL, log = FALSE, prior.count = 0.25, ...)
 				<h3>The inconsistency with the RPKM/FPKM unit</h3>
 			</header>
 
-			<p>However, RPKM should actually be avoided since it is inconsistent across
-				samples
+			<p>However, the RPKM is inconsistent across	samples
 				(<a href="http://www.ncbi.nlm.nih.gov/pubmed/22872506" target="_blank">Wagner <i>et al.</i> Theory Biosci., 2012</a>).
-				The reason is explained by the following insight: the relationship between
-				the total number of reads (\( R \) in the equations) and the actual total
-				number of cDNA fragments sampled depends on the length distribution of mRNA
-				transcripts. RPKM  normalizes by the total number of reads and this is <b>not
-				a measure of total transcript number</b>: this relationship depends on the
-				length distribution of transcripts, which is variable between samples. To
-				put it bluntly, this normalization factor is variable across samples, hence
+				The reason is explained by the following insight: RPKM normalizes by the
+				total number of reads and this is not a measure of total transcript number.
+				This relationship depends on the length distribution of transcripts, which
+				is variable between samples. In other words, the relationship between	the
+				total number of reads (\( R \) in the equations) and the actual total	number
+				of cDNA fragments sampled depends on the feature length distribution. For
+				this reason, this	normalization factor is variable across samples, hence
 				the statement that opens this paragraph: the resulting unit is inconsistent
 				across samples.
 			</p>
 
-			<p>Inter-feature differential expression within samples will still work. Running
-				the risk of upsetting the underlying message of this article, I will even
-				go as far as stating that even inter-sample RPKM comparisons will, in most
-				cases, be ok. In practical terms, since we typically look at thousands of
-				features and it is reasonable to assume that a majority of them will not
-				be differentially expressed between samples, we are probably not that far
-				off when using RPKM for inter-sample feature expression comparisons. We
-				can probably trust most conclusions drawn in such terms in the literature.
-			</p>
-
-			<p>The inconsistency is real and is there, though, so it needs fixing.
+			<p>Inter-feature differential expression analysis within samples will still
+				work. Running	the risk of weakening the underlying message of this article,
+				I will even go as far as stating that even inter-sample RPKM comparisons
+				will, in most	cases, be ok. In practical terms, since we typically look at
+				thousands of features and it is reasonable to assume that a majority of them
+				will not be differentially expressed between samples, we are probably not
+				that far off when using RPKM. We can probably trust most conclusions drawn
+				in such terms in the literature. The inconsistency is still real and is there,
+				though, so it needs fixing.
 			</p>
 
 			<header>
-				<h3>TPM is the solution (kind of...).</h3>
+				<h3>TPM is the solution (kind of...)</h3>
 			</header>
 
-			<p>From the explanation of RPKM's inconsistency above, a possible fix becomes apparent. Transcript length
-			distributions can vary between samples and that introduces an inconsistency in RPKM calculation. So,
-			instead of dividing by the total number of sequenced reads (\( R \)) for a given sample, we can instead
-			divide by the total number of length-normalized reads. This unit, <u>t</u>ranscripts <u>p</u>er
-			<u>m</u>illion fragments sequenced (TPM), was introduced originally in
-			<a href="https://www.ncbi.nlm.nih.gov/pubmed/20022975" target="_blank">Li <i>et al.</i> Bioinformatics, 2010</a>
-			 and further supported in
-			 <a href="http://www.ncbi.nlm.nih.gov/pubmed/22872506" target="_blank">Wagner <i>et al.</i> Theory Biosci., 2012</a>.
-			 Compare the TPM equation with CPM and RPKM's, re-arranjed here for direct comparison.
+			<p>A possible fix emerges from the explanation of RPKM's inconsistency above.
+				Transcript length distributions can vary between samples and that introduces
+				an inconsistency in RPKM calculation. So,	instead of dividing by the total
+				number of sequenced reads (\( R \)) for a given sample, we can instead divide
+				by the total number of length-normalized reads. This unit, <u>t</u>ranscripts
+				<u>p</u>er <u>m</u>illion fragments sequenced (TPM), was introduced originally in
+				<a href="https://www.ncbi.nlm.nih.gov/pubmed/20022975" target="_blank">Li <i>et al.</i> Bioinformatics, 2010</a>
+				and further supported in
+				<a href="http://www.ncbi.nlm.nih.gov/pubmed/22872506" target="_blank">Wagner <i>et al.</i> Theory Biosci., 2012</a>.
+				Compare the TPM equation with CPM and RPKM's, re-written here for direct comparison.
 
 			$$ \text{CPM}_i = \dfrac{r_i}{\sum_{j=1}^n r_j} \cdot 10^6 $$
 
@@ -311,12 +309,11 @@ function (x, lib.size = NULL, log = FALSE, prior.count = 0.25, ...)
 			$$ \text{TPM}_i = \dfrac{r_i}{\sum_{j=1}^n \dfrac{r_j}{l_j}} \cdot \dfrac{1}{l_i} \cdot 10^6 $$
 			</p>
 
-			<p>TPM is the new iteration of RNA-seq units and the one that should be used
-				instead of RPKM/FPKM. The interpretation is that \( TPM_i \) represents
-				the number of transcripts of feature \(i \) found in a total number of one
-				million transcripts. Interestingly, we can easily convert RPKM values to
-				TPM by simply dividing the a feature's RPKM by the sum of the RPKM values
-				over all features and multiplying by one million.
+			<p>The interpretation is that \( TPM_i \) represents the number of transcripts
+				of feature \(i \) found in a total number of one million transcripts. Interestingly,
+				we can easily convert RPKM values to TPM by simply dividing each feature's
+				RPKM by the sum of the RPKM values of all features and multiplying by one
+				million.
 
 			$$ \begin{aligned} \text{TPM}_i &= \dfrac{\text{RPKM}_i}{\sum_{j=1}^n \text{RPKM}_j } \cdot 10^6 \end{aligned} $$
 			</p>
@@ -326,9 +323,10 @@ function (x, lib.size = NULL, log = FALSE, prior.count = 0.25, ...)
 			</header>
 
 			<p>Armed with this information, we can convert RPKM to TPM in two different
-				ways: from pre-calculated RPKM by diving by the sum of RPKM values, or directly
-				from the normalized counts. Below is example R code to calculate TPM from RPKM
-				values computed using edgeR's <code1>rpkm</code1> function.
+				ways: from pre-calculated RPKM, by diving by the sum of RPKM values, or directly
+				from the normalized counts. Below I have written some example R code to
+				calculate TPM starting from RPKM values computed using edgeR's <code1>rpkm</code1>
+				function.
 			</p>
 
 			<p>
@@ -374,16 +372,28 @@ tpm_man <- calc_tpm(y, gene.length = y$genes$Length)</code>
 				thus brings us one step closer to a good solution. This unit is more stable
 				across samples than RPKM. However, the abundances of all transcripts will
 				still change between samples, meaning that the denominator of the TPM equation
-				(sum of length-normalized read counts) is variable. This way, TPM is <b>not
-					directly comparable between experiments</b> either. Further research is needed...
+				(sum of length-normalized read counts) is still variable. This way, TPM is
+				<b>not directly comparable between experiments</b> either.
+			</p>
+
+			<header>
+				<h3>Conclusion</h3>
+			</header>
+
+			<p>So if no unit seems to be perfect, how are we supposed to analyse differential
+				feature expression?	Further work is definitely required to develop a more
+				consistent unit. In the mean time, CPM is an appropriate unit for inter-sample
+				comparison. When comparing feature expression within samples, TPM should
+				be used	instead of RPKM/FPKM.
 			</p>
 
 			<p>If you want to dive deeper in the subject of why TPM is a better unit than
-				RPKM/FPKM, two very informative resources (other than the papers I cited here
-				above) are the blog posts published by Prof. Lior Pachter in his blog,
-				<a href="https://liorpachter.wordpress.com/tag/tpm/" target="_blank">Bits of DNA</a>,
-				and by Prof. Pachter's student Harold Pimentel in his own blog,
-				<a href="https://haroldpimentel.wordpress.com/2014/05/08/what-the-fpkm-a-review-rna-seq-expression-units/" target="_blank">The Farago</a>.
+				RPKM/FPKM, besides the papers I cited	above I would recommend two	very informative
+				blog posts published in
+				<a href="https://liorpachter.wordpress.com/tag/tpm/" target="_blank">Bits of DNA</a>
+				(by Prof. Lior Pachter) and
+				<a href="https://haroldpimentel.wordpress.com/2014/05/08/what-the-fpkm-a-review-rna-seq-expression-units/" target="_blank">The Farago</a>
+				(by Prof. Pachter's student Harold Pimentel).
 			</p>
 
 		</div>
