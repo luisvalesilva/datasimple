@@ -273,7 +273,8 @@ function (x, lib.size = NULL, log = FALSE, prior.count = 0.25, ...)
 				of cDNA fragments sampled depends on the feature length distribution. For
 				this reason, this	normalization factor is variable across samples, hence
 				the statement that opens this paragraph: the resulting unit is inconsistent
-				across samples.
+				across samples. A clear manifestation of the problem is the fact that the sum
+				of all RPKM values will vary from sample to sample.
 			</p>
 
 			<p>Inter-feature differential expression analysis within samples will still
@@ -313,7 +314,8 @@ function (x, lib.size = NULL, log = FALSE, prior.count = 0.25, ...)
 				of feature \(i \) found in a total number of one million transcripts. Interestingly,
 				we can easily convert RPKM values to TPM by simply dividing each feature's
 				RPKM by the sum of the RPKM values of all features and multiplying by one
-				million.
+				million. In fact, TPM is really just RPKM scaled by a constant to correct the sum
+				of all values to 1 million.
 
 			$$ \begin{aligned} \text{TPM}_i &= \dfrac{\text{RPKM}_i}{\sum_{j=1}^n \text{RPKM}_j } \cdot 10^6 \end{aligned} $$
 			</p>
