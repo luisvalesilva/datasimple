@@ -67,7 +67,7 @@
 				represented in the sample, such as exons or genes).
 			</p>
 
-			<p>Besides the relative expression of the	genomic feature, which is exactly
+			<p>Besides the relative expression of the genomic feature, which is exactly
 				the target measurement in RNA-seq experiments, read counts depend on other
 				confounding factors. Namely, read counts for each genomic feature depend
 				heavily on the total number of obtained reads (sequencing depth) and that
@@ -80,13 +80,13 @@
 				also affected by transcriptome and nucleotide composition.
 			</p>
 
-			<p>An open challenge of RNA-seq data analysis is the establishment of	a	unit
+			<p>An open challenge of RNA-seq data analysis is the establishment of a unit
 				allowing both within-sample and inter-sample differential feature expression
 				analysis. Many years after the creation of RNA-seq, and at a time when it
 				is routinely used in many labs around the world, the community is still
 				divided when it comes to what expression unit to use. Here I will go over
-				different units and	the overall math behind them, as well as their implementation
-				in the popular gene expression analysis R and Bioconductor package
+				different units and the basic math behind them, as well as their implementation
+				in the popular gene expression analysis Bioconductor package
 				<a href="https://bioconductor.org/packages/release/bioc/html/edgeR.html" target="_blank">edgeR</a>.
 			</p>
 
@@ -128,7 +128,7 @@
 			</p>
 
 			<p>After sample normalization, expression units are chosen for inter-sample
-				and within-sample differential feature expression analysis. I will go over
+				and within-sample differential feature expression analysis. Here I will go over
 				the most popular units and discuss the fact that the most commonly used
 				unit for within-sample feature expression comparison has a better alternative
 				that should be used instead.</p>
