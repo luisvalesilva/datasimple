@@ -1,0 +1,164 @@
+<!DOCTYPE HTML>
+<!--
+	Based on the template 'Retrospect', by TEMPLATED
+	Template released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+
+	Content by Luis Vale Silva
+-->
+<html lang="en">
+	<head>
+		<title>Data simple - Word clouds</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content="An exploration of word clouds using Andreas
+		Mueller's word_cloud Python library.">
+		<meta name="keywords" content="data science, data analysis, data visualization,
+		python, word clouds, word_cloud">
+		<meta name="author" content="Luis Vale Silva">
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+		<link rel="icon" href="images/datasimple_favicon.ico" type="image/x-icon">
+		 <link rel="stylesheet" href="assets/css/prism.css">
+		 <script src="assets/js/prism.js"></script>
+
+		 <!-- Google Analytics -->
+		<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-71624249-1', 'auto');
+  ga('send', 'pageview');
+  </script>
+
+	</head>
+	<body>
+
+	<!-- Header -->
+	<header id="header" class="skel-layers-fixed">
+		<h1><a href="index.html">Home</a></h1>
+	</header>
+
+	<!-- Main -->
+	<section id="main" class="wrapper">
+		<div class="container">
+			<header class="major special">
+				<h4><b>July 2016</b></h4>
+				<h2>A picture is worth a thousand words</h2>
+        <h3>Or how to make word clouds with Python</h3>
+			</header>
+          <center>
+            <p><font size="4" color="black">Full code on
+              <font size="6"><a href="https://github.com/luisvalesilva/word_clouds" target="_blank" class="icon fa-github"></a></font></font>
+            </p>
+          </center>
+          <br />
+          <p>They say a picture is worth a thousand words. Well, in this post a picture
+						is actually worth two thousand words by default (with a function argument
+						allowing you to control that number). The following is a simple example
+						of how to build word clouds from your favorite text. It uses Python library
+						<a href="https://github.com/amueller/word_cloud" target="_blank">word_cloud</a>,
+						which makes it really easy to generate a word cloud and additionally
+						allows you to have it adopt any shape you like, as long as you provide
+						a suitable stencil.</p>
+	  <header>
+	  	<h3>A wrapper function and the source text</h3>
+	  </header>
+	<p>Bla bla bla</p>
+
+			  <pre>
+				  <code class="language-python">
+from PIL import Image
+import numpy as np
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud, STOPWORDS
+
+
+def make_word_cloud(input_text, mask, output_file_name, stopwords=None, extra_stopwords=None,
+                    background_color = "white", max_words=2000):
+    """
+    Generates word cloud and writes it to .png file.
+    """
+
+    # Read the whole text
+    text = open(input_text).read()
+    # read the mask image
+    mask = np.array(Image.open(mask))
+
+    stopwords = set(stopwords)
+
+    if extra_stopwords is not None:
+        [stopwords.add(word) for word in extra_stopwords]
+
+    wc = WordCloud(background_color=background_color, max_words=max_words,
+                   mask=mask, stopwords=stopwords)
+
+    # generate word cloud
+    wc.generate(text)
+    # store to file
+    wc.to_file(output_file_name)</code>
+			</pre></br>
+
+			<p>Bla bla bla</p>
+
+			<header>
+				<h3>Generating a word cloud</h3>
+			</header>
+			<p>Bla bla bla</p>
+
+
+			<!-- Image -->
+			<div class="box alt">
+				<div class="row 50% uniform">
+					<div class="12u"><span class="image fit"><img src="images/word_clouds/blabla.png" alt="" /></span></div>
+				</div>
+			</div>
+
+			<header>
+				<h3>A better stop word collection</h3>
+			</header>
+			<p>Bla bla bla</p>
+
+			<p>Turns out...
+			</p>
+
+			<p>This is it. I hope this gave you a little taste of how powerful Pandas is to manipulate data
+				and how easy Folium makes it to build interactive maps. Again, you can see the full code,
+				including the analyses shown here and more, in a Jupyter Notebook file in this GitHub
+				<a href="https://github.com/luisvalesilva/exploring_citibike" target="_blank">repo</a>.
+			</p>
+
+		</div>
+  </section>
+  <!-- Footer -->
+  <footer id="footer">
+    <div class="inner">
+      <font size="1">
+        <ul class="copyright">
+          <li>&copy; Data simple</li>
+          <li></li><li></li>
+	  <li>Hosted on <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.</li>
+          <li></li><li></li>
+          <li>Design based on 'Retrospect' from <a href="http://templated.co" target="_blank" >TEMPLATED</a>.</li>
+        </ul></font>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/skel.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+    <script src="assets/js/main.js"></script>
+
+		<!-- GetSiteControl.com widgets -->
+		<script>
+		(function (w,i,d,g,e,t,s) {w[d] = w[d]||[];t= i.createElement(g);
+			t.async=1;t.src=e;s=i.getElementsByTagName(g)[0];s.parentNode.insertBefore(t, s);
+		})(window, document, '_gscq','script','//widgets.getsitecontrol.com/49202/script.js');
+		</script>
+  </body>
+</html>
