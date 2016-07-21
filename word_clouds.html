@@ -62,12 +62,46 @@
 						of how to build word clouds from your favorite text. It uses Python library
 						<a href="https://github.com/amueller/word_cloud" target="_blank">word_cloud</a>,
 						which makes it really easy to generate a word cloud and additionally
-						allows you to have it adopt any shape you like, as long as you provide
+						allows you to have the cloud adopt any shape you like, as long as you provide
 						a suitable stencil.</p>
 	  <header>
-	  	<h3>A wrapper function and the source text</h3>
+	  	<h3>The source text</h3>
 	  </header>
-	<p>Bla bla bla</p>
+	<p>The source text is "The Possessed", one of the available English	language
+		translations of a novel by one of my favorite auhors, Russian writer
+		Fyodor Dostoyevsky. I got the full text from
+		<a href="https://www.gutenberg.org/" target="_blank">Project Gutenberg</a>, a
+		great resource for free books. By the way, I would encourage you to support the
+		project if, like me, you think they provide a gret service to the community.
+		Back to our book, in this case I looked specifically for the plain text (UTF-8)
+		version. You can download it using <code1>wget</code1> as shown below.</p>
+		<pre>
+			<code class="language-bash">
+wget http://www.gutenberg.org/ebooks/8117.txt.utf-8 -O ThePossessed.txt</code>
+		</pre></br>
+
+		<p>In the original Russian the title means "Demons", so I thought a picture
+			of a devil would be appropriate for the stencil to define the shape of the
+			word cloud.</p>
+
+		<header>
+			<h3>A wrapper function to <code1>word_cloud</code1></h3>
+		</header>
+
+		<p><code1>word_cloud</code1> is really easy to use and it doesn't leave much for
+		the user to worry about. It even comes with its own set of stop words. If you are
+		not familiar with concept of "stop words", in simple terms it refers to the most
+		common words in a language. These are typically uninformative words concerning the
+		content or meaning of a document and are thus removed in preprocessing stages of
+		many Natural Language Processing (NLP) applications. Our word cloud is no exception.
+		Common words, like "the" or "and", for example, would dominate the output and
+		hide the less common, but more informative words we are more interested in.</p>
+
+		<p>I wrote a simple wrapper function around the main <code1>word_cloud</code1>
+		function <code1>WordCloud</code1>. The wrapper requires the input text, a mask
+		file to define the shape, and a name for the output <code1>.png</code1> file.
+		Additionally, it allows you to provide your own list of stop words. The code
+		below shows the wrapper function, as well as the required imports.</p>
 
 			  <pre>
 				  <code class="language-python">
@@ -102,28 +136,105 @@ def make_word_cloud(input_text, mask, output_file_name, stopwords=None, extra_st
     wc.to_file(output_file_name)</code>
 			</pre></br>
 
-			<p>Bla bla bla</p>
-
 			<header>
 				<h3>Generating a word cloud</h3>
 			</header>
-			<p>Bla bla bla</p>
+			<p>This is all we need to make our word cloud. We can call the wrapper function
+			and use the list of stop words provided by <code1>word_cloud</code1>.</p>
 
+			<pre>
+				<code class="language-python">
+make_word_cloud(input_text="ThePossessed.txt", mask="devil_stencil.jpg",
+				output_file_name="ThePossessed.png", stopwords=STOPWORDS)</code>
+			</pre></br>
 
 			<!-- Image -->
-			<div class="box alt">
-				<div class="row 50% uniform">
-					<div class="12u"><span class="image fit"><img src="images/word_clouds/blabla.png" alt="" /></span></div>
-				</div>
-			</div>
+			<center>
+					<div class="8u"><span class="image fit"><img src="images/word_clouds/ThePossessed.png" alt="word cloud" /></span></div>
+		</center>
+
+		<p>Looking at the word cloud, the result is a nicely balanced cloud with cool
+		colors and making up the shape we chose. The cloud is rather disapointing when
+		it comes to the informative power, though. We can see some character names and
+		a few interesting words, but the most important words are still quite generic
+		and uninformative.</p>
+
 
 			<header>
 				<h3>A better stop word collection</h3>
 			</header>
-			<p>Bla bla bla</p>
+			<p>The obvious next step is to get a better stop word collection. One of the
+			most popular NLP open source Python libraries is the Natural Language Toolkit
+			(<a href="http://www.nltk.org/api/nltk.html" target="_blank">NLTK</a>). So
+		let's try their stop word collection.</p>
 
-			<p>Turns out...
-			</p>
+		<pre>
+			<code class="language-python">
+from nltk.corpus import stopwords
+nltk_sw = stopwords.words('english')
+
+make_word_cloud(input_text="ThePossessed.txt", mask="devil_stencil.jpg",
+                output_file_name="ThePossessed_nltk_sw.png", stopwords=nltk_sw)</code>
+		</pre></br>
+
+		<!-- Image -->
+		<center>
+				<div class="8u"><span class="image fit"><img src="images/word_clouds/ThePossessed_nltk_sw.png" alt="word cloud" /></span></div>
+	</center>
+
+		<p>No improvement here. The result looks really similar and it is still dominated by
+		common, uninformative words. As you can see here below, both the <code1>word_cloud</code1>
+		and the NLTK stop word	collections include less than 200 words. Time to look
+		for longer lists.
+		</p>
+
+		<pre>
+			<code class="language-python">
+print len(STOPWORDS)
+print len(nltk_sw)
+# 183
+# 153</code>
+</pre></br>
+
+		<p>A little googling around reveals a more extensive stop word list compiled
+			by the <a href="http://members.unine.ch/jacques.savoy/clef/" target="_blank">IR Multilingual Resources</a>
+			at UniNE (University of Neuchâtel, Switzerland). Their English stop word list
+			includes 571 words, so it looks like a good bet. You can get it using <code1>wget</code1>
+			as follows.</p>
+
+			<pre>
+				<code class="language-bash">
+wget http://members.unine.ch/jacques.savoy/clef/englishST.txt</code>
+			</pre></br>
+
+			<p>Since we downloaded this list as a plain text file it will require a little more
+				work to get into Python. A little function will do the trick.</p>
+
+				<pre>
+					<code class="language-python">
+def load_words_from_file(path_to_file):
+    sw_list = []
+    with open(path_to_file, 'r') as f:
+        [sw_list.append(word) for line in f for word in line.split()]
+    return sw_list
+
+# Load stop words
+UniNE_sw = load_words_from_file('englishST.txt')</code>
+			</pre></br>
+
+			<p>And now we are ready to give this longer list a try. Let's see how well
+				it works.</p>
+
+			<pre>
+			<code class="language-python">
+make_word_cloud(input_text="ThePossessed.txt", mask="devil_stencil.jpg",
+          		output_file_name="ThePossessed_UniNE.png", stopwords=UniNE_sw)</code>
+			</pre></br>
+
+			<!-- Image -->
+			<center>
+					<div class="8u"><span class="image fit"><img src="images/word_clouds/ThePossessed_UniNE.png" alt="word cloud" /></span></div>
+		</center>
 
 			<p>This is it. I hope this gave you a little taste of how powerful Pandas is to manipulate data
 				and how easy Folium makes it to build interactive maps. Again, you can see the full code,
