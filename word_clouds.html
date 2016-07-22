@@ -60,15 +60,14 @@
 					favorite text. It uses the Python library
 					<a href="https://github.com/amueller/word_cloud" target="_blank"><code1>word_cloud</code1></a>,
 					which makes this really easy and	even allows you to have the output adopt
-					any shape you like, as long as you provide	a suitable stencil. So, as
+					any shape you like (as long as you provide	a suitable stencil). So, as
 					you'll see below, in this post a picture	is worth two thousand words by
 					default, actually, with an option to change that to whatever	number you want.</p>
 	  <header>
 	  	<h3>The source text</h3>
 	  </header>
-	<p>For the source text I picked "The Possessed", an English	language translation
-		of a novel by one of my favorite auhors, Russian writer Fyodor Dostoyevsky.
-		I got the full text from
+	<p>For the source text I picked "The Possessed", a novel by Russian writer Fyodor
+		Dostoyevsky, one of my favorite auhors. I got the full text from
 		<a href="https://www.gutenberg.org/" target="_blank">Project Gutenberg</a>, a
 		great resource for free books, which I would encourage you to support (if, like
 		me, you think they provide a gret service to the community). You can download
@@ -82,20 +81,22 @@ wget http://www.gutenberg.org/ebooks/8117.txt.utf-8 -O ThePossessed.txt</code>
 			<h3>A wrapper function to <code1>word_cloud</code1></h3>
 		</header>
 
-		<p><code1>word_cloud</code1> is really easy to use and really doesn't leave much for
+		<p><code1>word_cloud</code1> is really easy to use and doesn't leave much for
 		the user to worry about. It even comes with its own set of stop words. If you are
 		not familiar with the concept of "stop words", in simple terms it refers to the most
-		common words in a language. These are typically uninformative words in terms of the
-		content or meaning of a document and are thus removed in preprocessing stages of
-		many Natural Language Processing (NLP) applications. Our word cloud is no exception.
-		Common words, like "the" or "and", for example, would dominate the output and
-		hide the less common, but more informative words we are interested in.</p>
+		common words in a language. These are typically uninformative words, such as "the"
+		or "and", for example, that are thus removed during preprocessing in many Natural
+		Language Processing (NLP) applications.	Our word cloud is no exception. We don't
+		want stop words to dominate the output and hide the less common but more informative
+		words that define the input document.</p>
 
-		<p>I wrote a simple wrapper function around the main <code1>word_cloud</code1>
-		function <code1>WordCloud</code1> that takes the input text, a mask
-		file to define the shape, and a name for the output <code1>.png</code1> file.
-		Additionally, it allows you to provide your own list of stop words. You can see
-		it here	below, together with the required imports.</p>
+		<p>I wrote a simple wrapper function called <code1>make_word_cloud</code1> around the
+			main function <code1>WordCloud</code1>. <code1>make_word_cloud</code1> takes the
+			input text, a mask file to define the shape, and a name for the output <code1>.png</code1>
+			file. Additionally, it allows you to provide your own list of stop words instead of
+			the one provided by <code1>word_cloud</code1>. You can also add some extra stop
+			words manually, in case you spot some uninteresting words creeping into your cloud.
+			Here's <code1>make_word_cloud</code1>, together with the required imports.</p>
 
 			  <pre>
 				  <code class="language-python">
@@ -144,8 +145,7 @@ def make_word_cloud(input_text, mask, output_file_name, stopwords=None, extra_st
 			<p>This is all we need to make our word cloud. We can call the wrapper function
 			and use the list of stop words provided by <code1>word_cloud</code1>. In the
 			original Russian the title of the novel means "Demons", so I thought a picture
-			of a devil would be appropriate for the stencil to define the shape of the word
-			cloud.</p>
+			of a devil would be appropriate to define the shape of the word cloud.</p>
 
 			<pre>
 				<code class="language-python">
@@ -244,7 +244,10 @@ make_word_cloud(input_text="ThePossessed.txt", mask="devil_stencil.jpg",
 			<p>Much better. We got rid of most common and uninformative words and managed
 				to get a pretty interesting word cloud. And thanks to the	nice <code1>word_cloud</code1>
 				Python library this was really easy. A nice go-to resource for your word cloud
-				needs. Happy "word clouding"!
+				needs.
+			</p>
+
+			<p>Happy "word clouding"!
 			</p>
 
 		</div>
