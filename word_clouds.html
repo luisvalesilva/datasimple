@@ -217,6 +217,7 @@ wget http://members.unine.ch/jacques.savoy/clef/englishST.txt</code>
 				<pre>
 					<code class="language-python">
 def load_words_from_file(path_to_file):
+	"""Read text file return list of words."""
     sw_list = []
     with open(path_to_file, 'r') as f:
         [sw_list.append(word) for line in f for word in line.split()]
