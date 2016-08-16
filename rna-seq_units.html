@@ -63,30 +63,28 @@
 				fragments. The reads are then aligned to a reference genome or transcriptome,
 				in order to determine the qualitative and quantitative composition of the
 				cDNA library. The ultimate goal is the estimation of the relative abundance
-				of the underlying genomic features (the genomic regions that can appear
-				represented in the sample, such as exons or genes).
+				of the underlying genomic features, i.e. the genomic regions that can appear
+				represented in the sample, such as exons or genes.
 			</p>
 
-			<p>Besides the relative expression of the genomic feature, which is exactly
+			<p>Along with the relative expression of the genomic feature, which is exactly
 				the target measurement in RNA-seq experiments, read counts depend on other
 				confounding factors. Namely, read counts for each genomic feature depend
-				heavily on the total number of obtained reads (sequencing depth) and that
-				feature's length. The dependence on read length may be surprising to you,
-				as you might expect the method to produce a number of reads proportional
-				to the number of cDNA molecules in the sample. The key is the fragmentation
-				step referred above. Since sequencing requires that the molecules are broken
-				down into smaller pieces, longer transcripts will yield a higher number
-				of fragments and, thus, a higher read count. Additionally, read counts are
-				also affected by transcriptome and nucleotide composition.
+				heavily on the total number of obtained reads (sequencing depth) and the
+				feature's length, as well as transcriptome and nucleotide composition.
+				The dependence on feature length may be surprising to you, as you might
+				expect the method to produce a number of reads proportional to the number
+				of cDNA molecules in the sample. The key is the fragmentation step referred
+				above. Sequencing requires that the molecules are broken down into smaller
+				pieces. Longer transcripts will naturally yield a higher number of fragments
+				and, thus, a higher read count.
 			</p>
 
 			<p>An open challenge of RNA-seq data analysis is the establishment of a unit
 				allowing both within-sample and inter-sample differential feature expression
-				analysis. Many years after the creation of RNA-seq, and at a time when it
-				is routinely used in many labs around the world, the community is still
-				divided when it comes to what expression unit to use. Here I will go over
-				different units and the basic math behind them, as well as their implementation
-				in the popular gene expression analysis Bioconductor package
+				analysis. Here I will go over different units and the basic math behind them,
+				as well as their implementation in the popular gene expression analysis
+				Bioconductor package
 				<a href="https://bioconductor.org/packages/release/bioc/html/edgeR.html" target="_blank">edgeR</a>.
 			</p>
 
@@ -128,10 +126,8 @@
 			</p>
 
 			<p>After sample normalization, expression units are chosen for inter-sample
-				and within-sample differential feature expression analysis. Here I will go over
-				the most popular units and discuss the fact that the most commonly used
-				unit for within-sample feature expression comparison has a better alternative
-				that should be used instead.</p>
+				and within-sample differential feature expression analysis. I will go
+				over the most popular units next.</p>
 
 			<header>
 				<h3>CPM</h3>
@@ -139,11 +135,11 @@
 
 				<p>The simplest RNA-seq feature expression unit reports normalized
 					counts, or the number of reads that align to a particular feature after
-					correcting for sequencing depth and transcriptome composition bias. Counts
-					are the most popular unit among differential expression analysis methods
-					(including edgeR). However, feature length normalization is skipped, with
-					the important consequence that differential feature expression analysis
-					within samples is not possible.
+					correcting for sequencing depth and transcriptome composition bias.
+					Normalized counts are the most popular unit among differential expression
+					analysis methods (including edgeR). However, feature length normalization
+					is skipped, with the important consequence that within-sample differential
+					feature expression analysis is not possible.
 				</p>
 
 				<p>This unit is known as <u>c</u>ounts <u>p</u>er <u>m</u>illion reads
@@ -223,11 +219,11 @@ function (x, lib.size = NULL, log = FALSE, prior.count = 0.25, ...)
 				<u>m</u>illion reads mapped (RPKM), introduced with one of the original
 				RNA-seq papers
 				(<a href="http://www.ncbi.nlm.nih.gov/pubmed/18516045" target="_blank">Mortazavi <i>et al.</i> Nature Methods, 2008</a>).
-				The alternative unit FPKM is nothing more than a generalization to deal	with
-				the fact that, depending on the sequencing technology, a single sequenced
-				cDNA fragment can actually produce more than one read. This currently refers
-				to paired-end sequencing experiments, in which a read pair corresponds
-				to a cDNA fragment. The word 'reads' in RPKM is replaced by 'fragments' in
+				The alternative unit FPKM is nothing more than a generalization of RPKM to deal	with
+				the fact that a single sequenced cDNA fragment can actually produce more than
+				one read, depending on the sequencing technology. This currently refers
+				to paired-end sequencing experiments, in which a read pair, rather than a single read,
+				corresponds to a cDNA fragment. The word 'reads' in RPKM is replaced by 'fragments' in
 				FPKM. RPKM (or FPKM) is defined formally for each feature \(i\) as the count
 				(the	random variable	\( r_i \)) scaled by the feature's length (\( l_i \))
 				times	one thousand (to kilobase) and further scaled by the total number of
@@ -382,16 +378,16 @@ tpm_man <- calc_tpm(y, gene.length = y$genes$Length)</code>
 				<h3>Conclusion</h3>
 			</header>
 
-			<p>So if no unit seems to be perfect, how are we supposed to analyse differential
-				feature expression?	Further work is definitely required to develop a more
-				consistent unit. In the mean time, CPM is an appropriate unit for inter-sample
-				comparison. When comparing feature expression within samples, TPM should
-				be used	instead of RPKM/FPKM.
+			<p>So if no unit is perfect, how are we supposed to analyse differential feature
+				expression? Maybe a better unit will be developed at some point, but in
+				the mean time CPM is an appropriate unit for inter-sample comparison.
+				When comparing feature expression within samples, TPM should be used
+				instead of RPKM/FPKM.
 			</p>
 
 			<p>If you want to dive deeper in the subject of why TPM is a better unit than
-				RPKM/FPKM, besides the papers I cited	above I would recommend two	very informative
-				blog posts published in
+				RPKM/FPKM, besides the papers I cited above I would recommend two very
+				informative blog posts published in
 				<a href="https://liorpachter.wordpress.com/tag/tpm/" target="_blank">Bits of DNA</a>
 				(by Prof. Lior Pachter) and
 				<a href="https://haroldpimentel.wordpress.com/2014/05/08/what-the-fpkm-a-review-rna-seq-expression-units/" target="_blank">The Farago</a>
