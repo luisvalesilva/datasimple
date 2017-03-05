@@ -1,0 +1,155 @@
+<!DOCTYPE HTML>
+<!--
+	Based on the template 'Retrospect', by TEMPLATED
+	Template released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+
+	Content by Luis Vale Silva
+-->
+<html lang="en">
+	<head>
+		<title>Data simple - Digitre</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content="An exploration of word clouds using Andreas
+		Mueller's word_cloud Python library.">
+		<meta name="keywords" content="data science, data analysis, data visualization, Python,
+		machine learning, tensorflow, tflearn, Flask, MNIST, convolutional neural network, CNN">
+		<meta name="author" content="Luis Vale Silva">
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+		<link rel="icon" href="images/datasimple_favicon.ico" type="image/x-icon">
+		 <link rel="stylesheet" href="assets/css/prism.css">
+		 <script src="assets/js/prism.js"></script>
+
+		 <!-- Google Analytics -->
+		<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-71624249-1', 'auto');
+  ga('send', 'pageview');
+  </script>
+
+	</head>
+	<body>
+
+	<!-- Header -->
+	<header id="header" class="skel-layers-fixed">
+		<h1><a href="index.html">Home</a></h1>
+	</header>
+
+	<!-- Main -->
+	<section id="main" class="wrapper">
+		<div class="container">
+			<header class="major special">
+				<h4><b>March 2017</b></h4>
+				<h2>Digitre - recognizing handwritten digits</h2>
+        <h3>Or a how to make a simple application using Flask and tensorflow</h3>
+			</header>
+          <center>
+            <p><font size="4" color="black">Full code on
+              <font size="6"><a href="https://github.com/luisvalesilva/digitre" target="_blank" class="icon fa-github"></a></font></font>
+            </p>
+          </center>
+          <br />
+          <p>This post shows a simple example	of how to build word clouds from your
+					favorite text. It uses the Python library
+					<a href="https://github.com/amueller/word_cloud" target="_blank"><code1>word_cloud</code1></a>,
+					which makes this really easy and	bla bla bla.</p>
+
+		<header>
+			<h3>A wrapper function to <code1>word_cloud</code1></h3>
+		</header>
+
+		<p><code1>word_cloud</code1> is really easy to use and doesn't leave much for
+		the user to worry about. It even comes with its own set of stop words. If you are
+		not familiar with the concept of "stop words", in simple terms it refers to the most
+		common words in a language. These are typically uninformative words, such as "the"
+		or "and", for example, that are thus removed during preprocessing in many Natural
+		Language Processing (NLP) applications.	Our word cloud is no exception. We don't
+		want stop words to dominate the output and hide the less common but more informative
+		words that define the input document.</p>
+
+		<p>I wrote a simple wrapper function called <code1>make_word_cloud</code1> around the
+			main function <code1>WordCloud</code1>. <code1>make_word_cloud</code1> takes the
+			input text, a mask file to define the shape, and a name for the output <code1>.png</code1>
+			file. Additionally, it allows you to provide your own list of stop words instead of
+			the one provided by <code1>word_cloud</code1>. You can also add some extra stop
+			words manually, in case you spot some uninteresting words creeping into your cloud.
+			Here's <code1>make_word_cloud</code1>, together with the required imports.</p>
+
+			  <pre>
+				  <code class="language-python">
+import time
+import base64
+from io import BytesIO
+from PIL import Image
+import numpy as np
+
+
+def resize_img(img_ndarray):
+    """
+    Resizes digit image to 28x28.
+    Parameters
+    ----------
+    img_ndarray: 2D numpy ndarray, shape=(var, var) (depending on drawing)
+        Image to resize.
+    Returns
+    -------
+    Resized image as 2D numpy ndarray (28x28)
+    """
+    img = Image.fromarray(img_ndarray)
+    img.thumbnail((28, 28), Image.ANTIALIAS)
+
+    return np.array(img)</code>
+			</pre></br>
+
+			<!-- Image -->
+			<center>
+					<div class="8u"><span class="image fit"><img src="images/word_clouds/ThePossessed_UniNE.png" alt="word cloud" /></span></div>
+		</center>
+
+			<p>Much better. We got rid of most common and uninformative words and managed
+				to get a pretty interesting word cloud. And thanks to the <code1>word_cloud</code1>
+				Python library this was really easy. A nice go-to resource for your word cloud
+				needs.
+			</p>
+
+			<p>Happy "word clouding"!
+			</p>
+
+		</div>
+  </section>
+  <!-- Footer -->
+  <footer id="footer">
+    <div class="inner">
+      <font size="1">
+        <ul class="copyright">
+          <li>&copy; Data simple</li>
+          <li></li><li></li>
+	  <li>Hosted on <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.</li>
+          <li></li><li></li>
+          <li>Design based on 'Retrospect' from <a href="http://templated.co" target="_blank" >TEMPLATED</a>.</li>
+        </ul></font>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/skel.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+    <script src="assets/js/main.js"></script>
+
+		<!-- GetSiteControl.com widgets -->
+		<script>
+		(function (w,i,d,g,e,t,s) {w[d] = w[d]||[];t= i.createElement(g);
+			t.async=1;t.src=e;s=i.getElementsByTagName(g)[0];s.parentNode.insertBefore(t, s);
+		})(window, document, '_gscq','script','//widgets.getsitecontrol.com/49202/script.js');
+		</script>
+  </body>
+</html>
