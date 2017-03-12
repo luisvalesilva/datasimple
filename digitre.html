@@ -191,26 +191,63 @@ if __name__ == '__main__':
 			module, addressed in more detail in the sections discussing data preprocessing and the
 			machine learning classifier below. Additionally, <code1>get_digit()</code1> also prepares
 			the output by identifying the class (digits between 0 and 9) with the highest probability
-			in the output and composing the string to be displayed to the user. If the determined
-			probability is lower than 70%, the output class is not shown and the string is a message
-			indicating the digit could not be identified. Otherwise, the string contains the predicted
-			digit and the probability. This is to handle the fact that the model will always output a
-			digit class, even if the drawing does not look at all like a digit.
+			and composing the string to be displayed to the user. If the determined highest probability
+			is lower than 70%, the output class is not shown and the string is a message indicating the
+			digit could not be identified. This is to handle the fact that the model will always output a
+			digit class, even if the drawing does not look at all like a digit. Otherwise, the string
+			contains the predicted digit and its probability.
 		</p>
 
+		<header>
+			<h3>The machine learning digit recognizer</h3>
+		</header>
+
 		<p>
+		</p>
+		
+		<!-- Image -->
+		<center>
+			<div class="8u"><span class="image fit"><img src="images/digitre/mnist.jpg" alt="word cloud" style="width:304px;" /></span></div>
+		</center>
+
+		<p>
+		</p>
+
+		<p>The data received from the front end is not ready to be fed to the machine learning classifier, however.
+			On the one hand, the classifier would not be able to process a base64-encoded image. Additionally,
+			the images drawn by <strong>Digitre</strong>'s users look different from the MNIST images, since they are
+			drawn using the computer mouse on the screen instead of being scans of actual handwritten digits on paper.
+			Unless we make them more similar the classifier will show very poor performance. The next section discusses
+			<strong>Digitre</strong>'s image preprocessing code aimed at handling these two problems.
 		</p>
 
 		<header>
 			<h3>Preprocessing base64-encoded images</h3>
 		</header>
 
-		<header>
-			<h3>The machine learning digit recognizer</h3>
-		</header>
+		<p>The data sent to the server from the front end needs to be peprocessed before classification.
+			The first step is to convert the base64-encoded image of the digit drawn by the user to a
+			NumPy ndarray data structure. This is done using function <code1>b64_str_to_np()</code1>, at which
+			point, the data could be fed to the classifier. However, in order to minimize the loss
+			in classificatin accuracy caused by the differences to the MNIST training data, a few extra steps
+			need to be taken.
+		</p>
+
+		<p>Digits in the MNIST data are centered and fill the image. So I added function <code1>crop_img()</code1>
+			to crop white space around the user's drawing. The next function, <code1>resize_img()</code1>, resizes
+			the NumPy ndarray to 28 x 28, to match the 28 by 28 pixel	size of the images in MNIST. Finally, the
+			last two functions transform the data by scaling it to the range between 0 and 1 (function
+			<code1>min_max_scaler()</code1>) and reshaping the ndarray to the four-dimensional structure expected by
+			the classifier (function <code1>reshape_array()</code1>).
+		</p>
+
+		<p>If you are interested in the details, the complete functionality can be found in the <code1>digitre_preprocessing</code1>
+			module (full code on GitHub
+			<a href="https://github.com/luisvalesilva/digitre/blob/master/digitre/digitre_preprocessing.py" target="_blank">here</a>).
+		</p>
 
 		<header>
-			<h3>Ways to improve the app</h3>
+			<h3>Future directions</h3>
 		</header>
 
 		<p>Handle the fact that the output is always a digit class: e.g. do not show the class either
@@ -223,11 +260,6 @@ if __name__ == '__main__':
 
 			...
 		</p>
-
-		<!-- Image -->
-		<center>
-			<div class="8u"><span class="image fit"><img src="images/word_clouds/ThePossessed_UniNE.png" alt="word cloud" /></span></div>
-		</center>
 
 		<p>Happy "word clouding"!
 		</p>
