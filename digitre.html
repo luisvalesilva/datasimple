@@ -12,8 +12,9 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="description" content="An exploration of word clouds using Andreas
 		Mueller's word_cloud Python library.">
-		<meta name="keywords" content="data science, data analysis, data visualization, Python,
-		machine learning, tensorflow, tflearn, Flask, MNIST, convolutional neural network, CNN">
+		<meta name="keywords" content="data science, data analysis, data visualization,
+		Python, machine learning, computer vision, tensorflow, tflearn, Flask, MNIST,
+		convolutional neural network, CNN">
 		<meta name="author" content="Luis Vale Silva">
 		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -56,68 +57,114 @@
             </p>
           </center>
           <br />
-          <p>This post shows a simple example	of how to build word clouds from your
-					favorite text. It uses the Python library
-					<a href="https://github.com/amueller/word_cloud" target="_blank"><code1>word_cloud</code1></a>,
-					which makes this really easy and	bla bla bla.</p>
+          <p>Recently I have been exploring Python web frameworks and got really interested
+						in <a href="http://flask.pocoo.org/" target="_blank">Flask</a>.
+						I wanted to take a deeper look at it and thought the best way to do that was to
+						build a simple Flask web app. Since I am also really interested
+						in machine learning, the idea came naturally to make it a machine learning app.
+						That's the story behind <strong>Digitre</strong>, a handwritten <u>digit</u>
+						<u>re</u>cognizer.
+					</p>
+
+					<p>Handwritten digit recognition is an introductory problem in the field of computer
+						vision that has been studied extensively. It has arisen as the "Hello world" of
+						machine learning and is a great choice for a simple web app. Read on to learn more
+						about the app. You can find the live version at <a href="http://digitre.technology/" target="_blank">
+						digitre.technology</a>.
+					</p>
 
 		<header>
-			<h3>A wrapper function to <code1>word_cloud</code1></h3>
+			<h3>Building the front end</h3>
 		</header>
 
-		<p><code1>word_cloud</code1> is really easy to use and doesn't leave much for
-		the user to worry about. It even comes with its own set of stop words. If you are
-		not familiar with the concept of "stop words", in simple terms it refers to the most
-		common words in a language. These are typically uninformative words, such as "the"
-		or "and", for example, that are thus removed during preprocessing in many Natural
-		Language Processing (NLP) applications.	Our word cloud is no exception. We don't
-		want stop words to dominate the output and hide the less common but more informative
-		words that define the input document.</p>
+		<p><strong>Digitre</strong>'s front end design is based on "Intensify", one of the free responsive
+			CSS and html website templates by <a href="https://templated.co/" target="_blank">Templated</a>.
+			I tweaked the page design a little bit to made <strong>Digitre</strong>'s landing page.
+		</p>
 
-		<p>I wrote a simple wrapper function called <code1>make_word_cloud</code1> around the
-			main function <code1>WordCloud</code1>. <code1>make_word_cloud</code1> takes the
-			input text, a mask file to define the shape, and a name for the output <code1>.png</code1>
-			file. Additionally, it allows you to provide your own list of stop words instead of
-			the one provided by <code1>word_cloud</code1>. You can also add some extra stop
-			words manually, in case you spot some uninteresting words creeping into your cloud.
-			Here's <code1>make_word_cloud</code1>, together with the required imports.</p>
+		<p><strong>Digitre</strong> needs a way to allow the user to draw digits freely. The drawings then need
+			to be collected and passed on to the digit recognizer. <strong>Digitre</strong> uses JavaScript
+			to allow the user to draw graphics on the fly in an HTML <code1>canvas</code1> element.
+			The JavaScript code is adapted from a script I found on
+			<a href="http://codepen.io/miam84/pen/aNMryw" target="_blank">CodePen</a>.
+			The image drawn by the user is collected and base64 encoded for convenient processing.
+			Base64 encoding is a way to represent binary data in an ASCII string format often used
+			for images in web development. You can see <strong>Digitre</strong>'s final script on
+			<a href="https://github.com/luisvalesilva/digitre/blob/master/digitre/static/paint.js" target="_blank">GitHub</a>.
+		</p>
 
-			  <pre>
-				  <code class="language-python">
-import time
-import base64
-from io import BytesIO
-from PIL import Image
+		<header>
+			<h3>The Flask code</h3>
+		</header>
+
+		<p>Besides rendering the website, I needed Flask to perform three tasks:
+		</p>
+		<p>
+			<ol style="font-size:120%;">
+				<li>Collect the base64-encoded handwritten digit images</li>
+				<li>Hand the images to the machine learning recognizer</li>
+				<li>Return the result back to the front end</li>
+			</ol>
+		</p>
+		<p>
+			The complete Flask code is shown here below. In simple terms, it starts
+			with the imports, including the required Flask functionality, the digit recognizer
+			(more detail in the dedicated section below) and the scientific computing package NumPy.
+		</p>
+
+		<pre>
+			<code class="language-python">
+from flask import Flask, render_template, request, jsonify
+import digitre_classifier
 import numpy as np
 
+app = Flask(__name__)
 
-def resize_img(img_ndarray):
-    """
-    Resizes digit image to 28x28.
-    Parameters
-    ----------
-    img_ndarray: 2D numpy ndarray, shape=(var, var) (depending on drawing)
-        Image to resize.
-    Returns
-    -------
-    Resized image as 2D numpy ndarray (28x28)
-    """
-    img = Image.fromarray(img_ndarray)
-    img.thumbnail((28, 28), Image.ANTIALIAS)
+# Instantiate Classifier
+model = digitre_classifier.Classifier(file_name='cnn.tflearn')
 
-    return np.array(img)</code>
-			</pre></br>
+@app.route('/_get_digit', methods=['POST'])
+def get_digit():
+    """Get digit drawn by user as base64 image and recognize it"""
+    digit = request.data
+    digit = model.preprocess(digit)
+    prediction = model.classify(digit)[0]
+    # Get class with highest probability
+    max_idx = np.argmax(prediction)
+    max_val = prediction[max_idx]
+    prob = np.around(max_val, 3) * 100
+    # Build output strings
+    if prob < 70:
+        prediction = 'Huh...'
+        probability = 'You call that a digit?'
+    else:
+        prediction = '{}'.format(str(max_idx))
+        probability = '({}% probability)'.format(str(prob))
+
+    return jsonify(result=prediction, probability=probability)
+
+@app.route('/')
+def index():
+    """Render landing page"""
+    return render_template('index.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)</code>
+				</pre></br>
+
+				<header>
+					<h3>Preprocessing base64-encoded images</h3>
+				</header>
+
+				<header>
+					<h3>The machine learning digit recognizer</h3>
+				</header>
 
 			<!-- Image -->
 			<center>
-					<div class="8u"><span class="image fit"><img src="images/word_clouds/ThePossessed_UniNE.png" alt="word cloud" /></span></div>
-		</center>
-
-			<p>Much better. We got rid of most common and uninformative words and managed
-				to get a pretty interesting word cloud. And thanks to the <code1>word_cloud</code1>
-				Python library this was really easy. A nice go-to resource for your word cloud
-				needs.
-			</p>
+				<div class="8u"><span class="image fit"><img src="images/word_clouds/ThePossessed_UniNE.png" alt="word cloud" /></span></div>
+			</center>
 
 			<p>Happy "word clouding"!
 			</p>
