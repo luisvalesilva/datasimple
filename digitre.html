@@ -93,23 +93,45 @@
 			<a href="https://github.com/luisvalesilva/digitre/blob/master/digitre/static/paint.js" target="_blank">GitHub</a>.
 		</p>
 
+		<p>The next step is to share the drawn digit with the server, where Flask will handle the rest.
+			I am using AJAX with JQuery, which allows me to update the page to display the result of the digit
+			recognition without having to reload the whole web page. To write the code I used the
+			<a href="http://flask.pocoo.org/docs/0.12/patterns/jquery/" target="_blank">example</a>
+			in Flask's documentation as a starting point and changed it to transfer the data in JSON format
+			in the body of a <code1>POST</code1> request. The following is the final JavaScript function
+			(found at the end of the source html in the landing page <code1>index.html</code1>).
+		</p>
+
+<pre>
+		<code class="language-javascript">
+$(function() {
+	$('a#push_data').bind('click', function() {
+		$.ajax({
+			url : $SCRIPT_ROOT + '/_get_digit',
+			type: "POST",
+			data: JSON.stringify([
+			{digit: $('textarea[id="data-paint"]').val()}
+			]),
+			contentType: "application/json; charset=utf-8",
+			dataType: "json",
+			success: function(data){
+				$("#result").text(data.result);
+				$("#probability").text(data.probability);
+			}
+		});
+		return false;
+	});
+});</code>
+			</pre></br>
+
 		<header>
 			<h3>The Flask code</h3>
 		</header>
 
-		<p>Besides rendering the website, I needed Flask to perform three tasks:
-		</p>
-		<p>
-			<ol style="font-size:120%;">
-				<li>Collect the base64-encoded handwritten digit images</li>
-				<li>Hand the images to the machine learning recognizer</li>
-				<li>Return the result back to the front end</li>
-			</ol>
-		</p>
-		<p>
-			The complete Flask code is shown here below. In simple terms, it starts
-			with the imports, including the required Flask functionality, the digit recognizer
-			(more detail in the dedicated section below) and the scientific computing package NumPy.
+		<p>I needed Flask to perform three tasks besides rendering the website: collect the
+			base64-encoded handwritten digit images; hand the images over to the machine learning
+			recognizer; and return the result back to the front end. The complete Flask code is
+			shown here below.
 		</p>
 
 		<pre>
@@ -148,26 +170,67 @@ def index():
     """Render landing page"""
     return render_template('index.html')
 
-
 if __name__ == '__main__':
     app.run(debug=True)</code>
-				</pre></br>
+		</pre></br>
 
-				<header>
-					<h3>Preprocessing base64-encoded images</h3>
-				</header>
+		<p>To unpack its components, the script starts off with the imports, including the
+			required Flask functionality, the digit recognizer or classifier (more detail about
+			that in the dedicated section below), and the scientific computing package NumPy. Next
+			it instantiates the <code1>Flask</code1> and digit recognizer <code1>Classifier</code1>
+			classes. The argument to <code1>Flask</code1> is the application name. In this case I
+			am using Python's magic method (or "dunder") <code1>__name__</code1>. The <code1>file_name</code1>
+			argument to <code1>Classifier</code1> is the file containing the pre-trained machine
+			learning model (again, more on that below).
+		</p>
+		<p>Two functions implementing the Flask tasks follow. The functions use Flasks's
+			<code1>route()</code1> decorator to indicate what URL should trigger the function.
+			While <code1>index()</code1> simply renders the web page, <code1>get_digit()</code1> handles
+			all the digit recognition work. It collects the data, preprocesses the digit images, and runs
+			the digit recognizer. This uses functionality implemented in the <code1>digitre_classifier</code1>
+			module, addressed in more detail in the sections discussing data preprocessing and the
+			machine learning classifier below. Additionally, <code1>get_digit()</code1> also prepares
+			the output by identifying the class (digits between 0 and 9) with the highest probability
+			in the output and composing the string to be displayed to the user. If the determined
+			probability is lower than 70%, the output class is not shown and the string is a message
+			indicating the digit could not be identified. Otherwise, the string contains the predicted
+			digit and the probability. This is to handle the fact that the model will always output a
+			digit class, even if the drawing does not look at all like a digit.
+		</p>
 
-				<header>
-					<h3>The machine learning digit recognizer</h3>
-				</header>
+		<p>
+		</p>
 
-			<!-- Image -->
-			<center>
-				<div class="8u"><span class="image fit"><img src="images/word_clouds/ThePossessed_UniNE.png" alt="word cloud" /></span></div>
-			</center>
+		<header>
+			<h3>Preprocessing base64-encoded images</h3>
+		</header>
 
-			<p>Happy "word clouding"!
-			</p>
+		<header>
+			<h3>The machine learning digit recognizer</h3>
+		</header>
+
+		<header>
+			<h3>Ways to improve the app</h3>
+		</header>
+
+		<p>Handle the fact that the output is always a digit class: e.g. do not show the class either
+			check when the 2nd highest probability is above a certain threshold (20%?).
+
+			Improve the CNN model: the current state-of-the-art accuracy is > 95%.
+
+			Collect the images in a database, along with the user's class and train the model on those
+			data as well.
+
+			...
+		</p>
+
+		<!-- Image -->
+		<center>
+			<div class="8u"><span class="image fit"><img src="images/word_clouds/ThePossessed_UniNE.png" alt="word cloud" /></span></div>
+		</center>
+
+		<p>Happy "word clouding"!
+		</p>
 
 		</div>
   </section>
