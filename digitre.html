@@ -204,7 +204,7 @@ if __name__ == '__main__':
 
 		<p>
 		</p>
-		
+
 		<!-- Image -->
 		<center>
 			<div class="8u"><span class="image fit"><img src="images/digitre/mnist.jpg" alt="word cloud" style="width:304px;" /></span></div>
@@ -247,6 +247,32 @@ if __name__ == '__main__':
 		</p>
 
 		<header>
+			<h3>Deployment</h3>
+		</header>
+
+		<p>In order to deploy <strong>Digitre</strong>, I started by checking out several
+			Infrastructure-as-a-service (IaaS) providers. Among others, I took a look at the pricing and specs offered
+			by PythonAnywhere, Heroku, OpenShift, AWS Elastic Beanstalk, and Google App Engine. You can find a nice list
+			including these and more providers, with links to their Flask-specific instructions, in Flask's
+			documentation <a href="http://flask.pocoo.org/docs/0.12/deploying/" target="_blank">page</a> on deployment
+			options.</p>
+
+		<p>I was looking for more flexibility (and lower cost...), however, so I decided to go with a Virtual
+			private server (VPS) provider instead. There are also many VPS provider options, but eventually I went with
+			<a href="https://www.linode.com/" target="_blank">linode</a>, which I thought struck a nice balance between
+			cost and popularity. The self-hosting choice provides a lot of flexibility, but it also means you have to do
+			all the work yourself. Personally, not being an expert in this domain I would not go this way if I had any
+			particular security concerns, for example. But to host a simple toy app this is a great solution. You can
+			go even deeper, with the bare metal server possibility, if you're willing to get your own hardware.</p>
+
+		<p>In the end, I went with linode's cheapest Standard plan, installed Ubuntu 16.04 LTS as my operating system,
+			used the common engine-X (<a href="https://www.nginx.com/" target="_blank">nginx</a>) web server and the
+			green unicorn (<a href="http://gunicorn.org/" target="_blank">gunicorn</a>) WSGI HTTP server to run
+			the app. This is a pretty common setup, from what I know. My experience so far has been just great.
+		</p>
+
+
+		<header>
 			<h3>Future directions</h3>
 		</header>
 
@@ -261,7 +287,9 @@ if __name__ == '__main__':
 			...
 		</p>
 
-		<p>Happy "word clouding"!
+		<p>This is it. If you've made it this far, you saw that you can set up a full stack environment
+			and deploy your web app using easily accessible stable and reliable software. My only cost in
+			the whole process is the linode VPS. The internet runs on unix and open source software!
 		</p>
 
 		</div>
