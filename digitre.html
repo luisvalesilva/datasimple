@@ -10,8 +10,8 @@
 		<title>Data simple - Digitre</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="description" content="An exploration of word clouds using Andreas
-		Mueller's word_cloud Python library.">
+        <meta name="description" content="A simple machine learning application to recognize
+        handwritten digits.">
 		<meta name="keywords" content="data science, data analysis, data visualization,
 		Python, machine learning, computer vision, tensorflow, tflearn, Flask, MNIST,
 		convolutional neural network, CNN">
@@ -58,20 +58,19 @@
           </center>
           <br />
           <p>Recently I have been exploring Python web frameworks and got really interested
-						in <a href="http://flask.pocoo.org/" target="_blank">Flask</a>.
-						I wanted to take a deeper look at it and thought the best way to do that was to
-						build a simple Flask web app. Since I am also really interested
-						in machine learning, the idea came naturally to make it a machine learning app.
-						That's the story behind <strong>Digitre</strong>, a handwritten <u>digit</u>
-						<u>re</u>cognizer.
-					</p>
+                in <a href="http://flask.pocoo.org/" target="_blank">Flask</a>.
+				I wanted to take a deeper look at it and thought the best way to do that was to
+				build a simple Flask web app. Since I am also really interested
+				in machine learning, the idea came naturally to make it a machine learning app.
+				That's the story behind <strong>Digitre</strong>, a handwritten <u>digit</u>
+				<u>re</u>cognizer.
+           </p>
 
-					<p>Handwritten digit recognition is an introductory problem in the field of computer
-						vision that has been studied extensively. It has arisen as the "Hello world" of
-						machine learning and is a great choice for a simple web app. Read on to learn more
-						about the app. You can find the live version at <a href="http://digitre.technology/" target="_blank">
-						digitre.technology</a>.
-					</p>
+		   <p>Handwritten digit recognition is an introductory problem in the field of computer
+				vision that has been studied extensively. It has arisen as the "Hello world" of
+				machine learning and is a great choice for a simple web app. Read on to learn more
+				about the app. You can find the live version at <a href="http://digitre.technology/" target="_blank">digitre.technology</a>.
+		   </p>
 
 		<header>
 			<h3>Building the front end</h3>
@@ -207,7 +206,7 @@ if __name__ == '__main__':
 
 		<!-- Image -->
 		<center>
-			<div class="8u"><span class="image fit"><img src="images/digitre/mnist.jpg" alt="word cloud" style="width:304px;" /></span></div>
+			<div class="4u"><span class="image fit"><img src="images/digitre/mnist.jpg" alt="word cloud"/></span></div>
 		</center>
 
 		<p>
@@ -228,20 +227,54 @@ if __name__ == '__main__':
 		<p>The data sent to the server from the front end needs to be peprocessed before classification.
 			The first step is to convert the base64-encoded image of the digit drawn by the user to a
 			NumPy ndarray data structure. This is done using function <code1>b64_str_to_np()</code1>, at which
-			point, the data could be fed to the classifier. However, in order to minimize the loss
+			point the data could be fed to the classifier. However, in order to minimize the loss
 			in classificatin accuracy caused by the differences to the MNIST training data, a few extra steps
 			need to be taken.
 		</p>
 
-		<p>Digits in the MNIST data are centered and fill the image. So I added function <code1>crop_img()</code1>
+        <p>Let's walk through an example to see what the preprocessing steps look like. Here's an example of what
+        the user input may look like.
+        </p>
+        
+		<center>
+			<div class="4u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_screenshot.png" alt="digitre input"/></span></div>
+		</center>
+        
+        <p>
+        Digits in the MNIST data are centered and fill the image. So I added function <code1>crop_img()</code1>
 			to crop white space around the user's drawing. The next function, <code1>resize_img()</code1>, resizes
-			the NumPy ndarray to 28 x 28, to match the 28 by 28 pixel	size of the images in MNIST. Finally, the
+			the NumPy ndarray to 28 x 28, to match the 28 by 28 pixel size of the images in MNIST. Finally, the
 			last two functions transform the data by scaling it to the range between 0 and 1 (function
 			<code1>min_max_scaler()</code1>) and reshaping the ndarray to the four-dimensional structure expected by
-			the classifier (function <code1>reshape_array()</code1>).
-		</p>
+            the classifier (function <code1>reshape_array()</code1>). Here's a sequence of pictures illustrating the whole process.
+         </p>
+         <p>In this particular instance the user drew the
+         digit at the top right corner of the canvas. This is an instance where the image cropping is particularly important.
+         It centers the digit just like the training data. The image is next resized to 28 x 28 px. The final step, rescaling
+         it to the range of values between 0 and 1 has no effect on the appearance of the image.
+         </p>
+    
+        <div class="row 50% uniform">
+        <div class="4u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_1.png" alt="" /></span></div>
+        <div class="4u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_2.png" alt="" /></span></div>
+        <div class="4u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_3.png" alt="" /></span></div>
+        </div>
 
-		<p>If you are interested in the details, the complete functionality can be found in the <code1>digitre_preprocessing</code1>
+
+        <center>
+        <div class="row 50% uniform">
+        <div class="4u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_3.png" alt="" /></span></div>
+        <div class="4u"><span class="image fit"><img src="images/digitre/MNIST_2.png" alt="" /></span></div>
+        <div class="4u$"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_screenshot_with_pred.png" alt="" /></span></div>
+        </div>
+        </center>
+        
+        <center>
+        <div class="4u$"><span class="image fit"><img src="images/digitre/MNIST_2.png" alt="" /></span></div>
+        <div class="4u$"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_screenshot_with_pred.png" alt="" /></span></div>
+        </center>
+
+        <p>If you are interested in the details, the complete functionality can be found in the <code1>digitre_preprocessing</code1>
 			module (full code on GitHub
 			<a href="https://github.com/luisvalesilva/digitre/blob/master/digitre/digitre_preprocessing.py" target="_blank">here</a>).
 		</p>
