@@ -246,10 +246,10 @@ if __name__ == '__main__':
 			the NumPy ndarray to 28 x 28, to match the 28 by 28 pixel size of the images in MNIST. Finally, the
 			last two functions transform the data by scaling it to the range between 0 and 1 (function
 			<code1>min_max_scaler()</code1>) and reshaping the ndarray to the four-dimensional structure expected by
-            the classifier (function <code1>reshape_array()</code1>). Here's a sequence of pictures illustrating the whole process.
+            the classifier (function <code1>reshape_array()</code1>).
          </p>
-         <p>In this particular instance the user drew the
-         digit at the top right corner of the canvas. This is an instance where the image cropping is particularly important.
+         <p>Here's a sequence of pictures illustrating the whole process. In this example the user drew the digit at
+         the top right corner of the canvas. This is thus an instance where the image cropping is particularly important.
          It centers the digit just like the training data. The image is next resized to 28 x 28 px. The final step, rescaling
          it to the range of values between 0 and 1 has no effect on the appearance of the image.
          </p>
@@ -260,17 +260,20 @@ if __name__ == '__main__':
         <div class="4u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_3.png" alt="" /></span></div>
         </div>
 
+        <p> The final result is quite similar to the training data in MNIST, as you can see here below. The processed
+        image on the left here below is quite similar to an example from MNIST (on the right).</p>
 
         <center>
         <div class="row 50% uniform">
-        <div class="4u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_3.png" alt="" /></span></div>
-        <div class="4u"><span class="image fit"><img src="images/digitre/MNIST_2.png" alt="" /></span></div>
-        <div class="4u$"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_screenshot_with_pred.png" alt="" /></span></div>
+        <div class="6u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_3.png" alt="" /></span></div>
+        <div class="6u$"><span class="image fit"><img src="images/digitre/MNIST_2.png" alt="" /></span></div>
         </div>
         </center>
         
+        <p> And this is what <strong>Digitre</strong>'s output would have looked like.
+        </p>
+
         <center>
-        <div class="4u$"><span class="image fit"><img src="images/digitre/MNIST_2.png" alt="" /></span></div>
         <div class="4u$"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_screenshot_with_pred.png" alt="" /></span></div>
         </center>
 
