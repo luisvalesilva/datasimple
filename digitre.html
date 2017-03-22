@@ -295,12 +295,12 @@ def build():
 		</center>
         
         <p>
-        Digits in the MNIST data are centered and fill the image. So I added function <code1>crop_img()</code1>
-			to crop white space around the user's drawing. The next function, <code1>resize_img()</code1>, resizes
-			the NumPy ndarray to 28 x 28, to match the 28 by 28 pixel size of the images in MNIST. Finally, the
-			last two functions transform the data by scaling it to the range between 0 and 1 (function
-			<code1>min_max_scaler()</code1>) and reshaping the ndarray to the four-dimensional structure expected by
-            the classifier (function <code1>reshape_array()</code1>).
+        Digits in the MNIST data are centered on their center of mass. So I added functions <code1>crop_img()</code1>
+        and <code1>center_img()</code1> to crop white space around the user's drawing and center the digit on the center
+        of mass pixel. The next function, <code1>resize_img()</code1>, resizes the NumPy ndarray to 28 x 28, to match
+        the 28 by 28 pixel size of the images in MNIST. Finally, the last two functions transform the data by scaling
+        it to the range between 0 and 1 (function <code1>min_max_scaler()</code1>) and reshaping the ndarray to the
+        four-dimensional structure expected by the classifier (function <code1>reshape_array()</code1>).
          </p>
          <p>Here's a sequence of pictures illustrating the whole process. In this example the user drew the digit at
          the top right corner of the canvas. This is thus an instance where the image cropping is particularly important.
@@ -310,8 +310,8 @@ def build():
     
         <div class="row 50% uniform">
         <div class="4u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_1.png" alt="" /></span></div>
-        <div class="4u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_2.png" alt="" /></span></div>
         <div class="4u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_3.png" alt="" /></span></div>
+        <div class="4u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_4.png" alt="" /></span></div>
         </div>
 
         <p> The final result is quite similar to the training data in MNIST, as you can see here below. The processed
@@ -319,7 +319,7 @@ def build():
 
         <center>
         <div class="row 50% uniform">
-        <div class="6u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_3.png" alt="" /></span></div>
+        <div class="6u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_4.png" alt="" /></span></div>
         <div class="6u$"><span class="image fit"><img src="images/digitre/MNIST_2.png" alt="" /></span></div>
         </div>
         </center>
