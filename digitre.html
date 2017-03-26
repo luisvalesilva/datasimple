@@ -67,9 +67,11 @@
            </p>
 
 		   <p>Handwritten digit recognition is an introductory problem in the field of computer
-				vision that has been studied extensively. It has arisen as the "Hello world" of
-				machine learning and is a great choice for a simple web app. Read on to learn more
-				about the app. You can find the live version at <a href="http://digitre.technology/" target="_blank">digitre.technology</a>.
+           vision. It has been studied extensively and has effectively become the "Hello world"
+           of machine learning. It is thus a great choice for a simple web app, allowing me to
+           focus more on the web framework code. Read on to learn all about the app. For a preview
+           of the final result, you can find the live version at
+           <a href="http://digitre.technology/" target="_blank">digitre.technology</a>.
 		   </p>
 
 		<header>
@@ -81,13 +83,13 @@
 			I tweaked the page design a little bit to made <strong>Digitre</strong>'s landing page.
 		</p>
 
-		<p><strong>Digitre</strong> needs a way to allow the user to draw digits freely. The drawings then need
+		<p>As its main functionality, <strong>Digitre</strong> needs a way to allow the user to draw digits freely. The drawings then need
 			to be collected and passed on to the digit recognizer. <strong>Digitre</strong> uses JavaScript
 			to allow the user to draw graphics on the fly in an HTML <code1>canvas</code1> element.
 			The JavaScript code is adapted from a script I found on
 			<a href="http://codepen.io/miam84/pen/aNMryw" target="_blank">CodePen</a>.
 			The image drawn by the user is collected and base64 encoded for convenient processing.
-			Base64 encoding is a way to represent binary data in an ASCII string format often used
+			Base64 encoding is a way to represent binary data in an ASCII string format, often used
 			for images in web development. You can see <strong>Digitre</strong>'s final script on
 			<a href="https://github.com/luisvalesilva/digitre/blob/master/digitre/static/paint.js" target="_blank">GitHub</a>.
 		</p>
@@ -154,12 +156,12 @@ def get_digit():
     max_idx = np.argmax(prediction)
     max_val = prediction[max_idx]
     prob = np.around(max_val, 3) * 100
-    # Build output strings
-    if prob < 70:
+    # Output strings
+    if prob < 60:
         prediction = 'Huh...'
         probability = 'You call that a digit?'
     else:
-        prediction = '{}'.format(str(max_idx))
+        prediction = str(max_idx)
         probability = '({}% probability)'.format(str(prob))
 
     return jsonify(result=prediction, probability=probability)
@@ -191,7 +193,7 @@ if __name__ == '__main__':
 			machine learning classifier below. Additionally, <code1>get_digit()</code1> also prepares
 			the output by identifying the class (digits between 0 and 9) with the highest probability
 			and composing the string to be displayed to the user. If the determined highest probability
-			is lower than 70%, the output class is not shown and the string is a message indicating the
+			is lower than 60%, the output class is not shown and the string is a message indicating the
 			digit could not be identified. This is to handle the fact that the model will always output a
 			digit class, even if the drawing does not look at all like a digit. Otherwise, the string
 			contains the predicted digit and its probability.
@@ -202,7 +204,7 @@ if __name__ == '__main__':
 		</header>
 
         <p>As I mentioned above, handwritten digit recognition is a widely studied problem in the field of
-        computer vision. A popular training dataset, the <a href="http://yann.lecun.com/exdb/mnist/" target="_blank">mnist</a>,
+        computer vision. A popular training dataset, the <a href="http://yann.lecun.com/exdb/mnist/" target="_blank">MNIST</a>,
         has been around for quite some time and has been used extensively to benchmark developments in the field.
         It is a subset of a larger dataset distributed by the National Institute of Standards and Technology (NIST).
         MNIST includes balanced training and test sets of 60,000 and 10,000 scanned handwritten digits, respectively.
@@ -215,13 +217,15 @@ if __name__ == '__main__':
 			<div class="4u"><span class="image fit"><img src="images/digitre/mnist.jpg" alt="word cloud"/></span></div>
 		</center>
 
-        <p>I decided to use <a href="https://www.tensorflow.org/" target="_blank">tensorflow</a>, Google's machine
-        learning software library to implement the machine learning model. As you can see in MNIST's
-        <a href="http://yann.lecun.com/exdb/mnist/" target="_blank">webpage</a>, the best classification accuracies
-        are achieved with large/deep convolutional neural networks (CNNs). However, you can get very decent accuracies
-        with relatively shallow CNNs too. So, at least for the first implementation, I decided to use a realtively
-        simple standard CNN architecture, with three hidden layers (two convolutional and one fully connected). Here
-        is the code.
+        <p>I decided to use <a href="https://www.tensorflow.org/" target="_blank">TensorFlow</a>, Google's machine
+        learning software library to implement the machine learning model. To make the implementation even simpler,
+        I went one step higher in the abstraction level and used <a href="http://tflearn.org" target="_blank">TFlearn</a>,
+        a software library providing "a higher-level API to TensorFlow". As for the choice of machine learning algorithm,
+        the best classification accuracies are achieved with deep convolutional neural networks (CNNs), as you can see
+        in MNIST's <a href="http://yann.lecun.com/exdb/mnist/" target="_blank">webpage</a>. However, you can get very
+        decent accuracies with relatively shallow CNNs too. So, at least for the first implementation, I decided to use
+        a relatively simple CNN architecture with three hidden layers (two convolutional and one fully connected) and
+        relatively small numbers of neurons. Here is the TFlearn code.
 
 <pre>
 <code class="language-python">
@@ -261,17 +265,88 @@ def build():
 		</pre></br>
 
         
-
-		
-		<p>
+		<p>The function above builds the TFlearn model. The next step is to train the model on the
+MNIST data. This only has to be done once. The trained model can then be saved and later restored for
+use without the need to be retrained. The code below shows three functions I wrote to load the training
+data, train (i.e. fit) the CNN model, and save the trained model to disk. For convenience, I am using
+the MNIST dataset version that is distributed with TFlearn.
 		</p>
 
-		<p>The data received from the front end is not ready to be fed to the machine learning classifier, however.
-			On the one hand, the classifier would not be able to process a base64-encoded image. Additionally,
-			the images drawn by <strong>Digitre</strong>'s users look different from the MNIST images, since they are
-			drawn using the computer mouse on the screen instead of being scans of actual handwritten digits on paper.
-			Unless we make them more similar the classifier will show very poor performance. The next section discusses
-			<strong>Digitre</strong>'s image preprocessing code aimed at handling these two problems.
+<pre>
+<code class="language-python">
+def load_data():
+    """
+    Get MNIST training data distributed with TFLearn.
+
+    Returns
+    -------
+    Tuple containing four object:
+        X: Training data
+        Y: Training labels
+        testX: Test data
+        testY: Test labels
+
+    """
+    X, Y, testX, testY = mnist.load_data(one_hot=True)
+    X = X.reshape([-1, 28, 28, 1])
+    testX = testX.reshape([-1, 28, 28, 1])
+
+    return X, Y, testX, testY
+
+
+def fit(model, X, Y, testX, testY, n_epoch=20, run_=cn_mnist'):
+    """
+    Fit (train) classification model.
+
+    Parameters
+    ----------
+    model: TFLearn model
+        Built and defined model.
+    X: numpy ndarray, shape=(55000, 28, 28, 1)
+        Training data
+    Y: numpy ndarray, shape=(55000, 10)
+        Training labels
+    testX: numpy ndarray, shape=(10000, 28, 28, 1)
+        Test data
+    testY: numpy ndarray, shape=(10000, 10)
+        Test labels
+    n_epoch: int, default=20
+        Number of training epochs
+    run_id: str, default='cnn_mnist'
+        ID to assign the current run
+    """
+    model.fit({'input': X}, {'target': Y}, n_epoch=n_epoch,
+              validation_set=({'input': testX}, {'target': testY}),
+              snapshot_step=100, show_metric=True, run_id=run_id)
+
+
+def save(model, file_name='cnn.tflearn'):
+    """
+    Save trained classification model in current woring directory.
+
+    Parameters
+    ----------
+    model: TFLearn model
+        Trained model
+    file_name: string, default='cnn.tflearn'
+        Name to assign model file written to disk
+    """
+    cwd = os.path.dirname(__file__)
+    model.save(os.path.join(cwd, file_name))</code>
+        </pre></br>
+
+        <p>After training the CNN for 20 epochs it showed 98.92% evaluation accuracy. This is not exactly top performance
+in the context of state-of-the-art research results. The current best is
+<a href="http://rodrigob.github.io/are_we_there_yet/build/classification_datasets_results.html#4d4e495354" target="_blank">99.79%</a>.
+It allows for good performance for this simple app, though, and at the very least it's a good first implementation. From here all
+I need to do is call the <code1>build()</code1> function to assemble the model architecture and load the pretrained model parameters
+from disk. I can then call TFlearn's <code1>predict()</code1> function to classify a previously unseen example.
+       </p>
+
+		<p>The data received from <strong>Digitre</strong>'s front end is not ready to be fed to the machine learning classifier,
+however. On the one hand, the classifier would not be able to process a base64-encoded image. Additionally,	the images drawn
+by the users will look different from the MNIST images. Unless we make them more similar the classifier will show very poor
+performance. The next section discusses	<strong>Digitre</strong>'s image preprocessing code, aimed at handling these two problems.
 		</p>
 
 		<header>
@@ -281,31 +356,30 @@ def build():
 		<p>The data sent to the server from the front end needs to be peprocessed before classification.
 			The first step is to convert the base64-encoded image of the digit drawn by the user to a
 			NumPy ndarray data structure. This is done using function <code1>b64_str_to_np()</code1>, at which
-			point the data could be fed to the classifier. However, in order to minimize the loss
-			in classificatin accuracy caused by the differences to the MNIST training data, a few extra steps
-			need to be taken.
-		</p>
-
-        <p>Let's walk through an example to see what the preprocessing steps look like. Here's an example of what
-        the user input may look like.
+			point the data could be fed to the classifier. However, in order to minimize the loss in classificatin
+            accuracy caused by the differences to the MNIST training data, a few extra steps need to be taken.
+            Let's walk through an example of the preprocessing steps. To start with, here's an example of what
+            the user input might look like.
         </p>
         
 		<center>
 			<div class="4u"><span class="image fit"><img src="images/digitre/b64_2_preprocessing_screenshot.png" alt="digitre input"/></span></div>
 		</center>
         
-        <p>
-        Digits in the MNIST data are centered on their center of mass. So I added functions <code1>crop_img()</code1>
-        and <code1>center_img()</code1> to crop white space around the user's drawing and center the digit on the center
-        of mass pixel. The next function, <code1>resize_img()</code1>, resizes the NumPy ndarray to 28 x 28, to match
-        the 28 by 28 pixel size of the images in MNIST. Finally, the last two functions transform the data by scaling
-        it to the range between 0 and 1 (function <code1>min_max_scaler()</code1>) and reshaping the ndarray to the
-        four-dimensional structure expected by the classifier (function <code1>reshape_array()</code1>).
+        <p>In this particular instance, the user drew the digit "2" at the top right corner of the canvas. Digits in the
+        MNIST data are centered on their center of mass, so it will help to do that before feeding the image to the classifier.
+        I added functions <code1>crop_img()</code1> and <code1>center_img()</code1> to crop white space around the user's
+        drawing and center the digit on the center of mass pixel. The next function, <code1>resize_img()</code1>, resizes the
+        NumPy ndarray to 28 x 28, to match the 28 by 28 pixel size of the images in MNIST. Finally, the last two functions
+        transform the data by scaling it to the range between 0 and 1 (function <code1>min_max_scaler()</code1>) and reshaping
+        the ndarray to the four-dimensional structure expected by the classifier (function <code1>reshape_array()</code1>).
          </p>
-         <p>Here's a sequence of pictures illustrating the whole process. In this example the user drew the digit at
-         the top right corner of the canvas. This is thus an instance where the image cropping is particularly important.
-         It centers the digit just like the training data. The image is next resized to 28 x 28 px. The final step, rescaling
-         it to the range of values between 0 and 1 has no effect on the appearance of the image.
+
+         <p>Here's a sequence of pictures illustrating the whole process. The picture on the left shows the original image.
+            In this example cropping the image is particularly important, to have the digit fill the frame like in the training
+            data. The picture on the center shows the result of cropping and centering the digit. The image is next resized to
+            28 x 28 px, resulting in the picture shown on the right side. The final step, rescaling it to the range of values
+            between 0 and 1 has no effect on the appearance of the image.
          </p>
     
         <div class="row 50% uniform">
@@ -315,7 +389,7 @@ def build():
         </div>
 
         <p> The final result is quite similar to the training data in MNIST, as you can see here below. The processed
-        image on the left here below is quite similar to an example from MNIST (on the right).</p>
+        image on the left is quite similar to an example from MNIST (on the right).</p>
 
         <center>
         <div class="row 50% uniform">
@@ -324,7 +398,7 @@ def build():
         </div>
         </center>
         
-        <p> And this is what <strong>Digitre</strong>'s output would have looked like.
+        <p> And, finally, here's what <strong>Digitre</strong>'s output would have looked like.
         </p>
 
         <center>
@@ -349,18 +423,17 @@ def build():
 
 		<p>I was looking for more flexibility (and lower cost...), however, so I decided to go with a Virtual
 			private server (VPS) provider instead. There are also many VPS provider options, but eventually I went with
-			<a href="https://www.linode.com/" target="_blank">linode</a>, which I thought struck a nice balance between
-			cost and popularity. The self-hosting choice provides a lot of flexibility, but it also means you have to do
-			all the work yourself. Personally, not being an expert in this domain I would not go this way if I had any
+			<a href="https://www.linode.com/" target="_blank">linode</a>, which offered a nice platform and very attractive
+			pricing. The self-hosting choice provides a lot of flexibility, but it also means you have to do
+			all the work yourself. Personally, not being an expert in this domain I would not have gone this way if I had any
 			particular security concerns, for example. But to host a simple toy app this is a great solution. You can
 			go even deeper, with the bare metal server possibility, if you're willing to get your own hardware.</p>
 
 		<p>In the end, I went with linode's cheapest Standard plan, installed Ubuntu 16.04 LTS as my operating system,
 			used the common engine-X (<a href="https://www.nginx.com/" target="_blank">nginx</a>) web server and the
 			green unicorn (<a href="http://gunicorn.org/" target="_blank">gunicorn</a>) WSGI HTTP server to run
-			the app. This is a pretty common setup, from what I know. My experience so far has been just great.
+			the app. This is a pretty common and robust setup and my experience with it has been just great so far.
 		</p>
-
 
 		<header>
 			<h3>Future directions</h3>
@@ -369,7 +442,8 @@ def build():
 		<p>Handle the fact that the output is always a digit class: e.g. do not show the class either
 			check when the 2nd highest probability is above a certain threshold (20%?).
 
-			Improve the CNN model: the current state-of-the-art accuracy is > 95%.
+			Improve the CNN model: at the time of this writing, state-of-the-art accuracy is 
+<a href="http://rodrigob.github.io/are_we_there_yet/build/classification_datasets_results.html#4d4e495354" target="_blank">99.79%</a>.
 
 			Collect the images in a database, along with the user's class and train the model on those
 			data as well.
