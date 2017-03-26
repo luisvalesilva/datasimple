@@ -449,13 +449,16 @@ performance. The next section discusses	<strong>Digitre</strong>'s image preproc
 
         <p><strong>Digitre</strong>'s first implementation works relatively well and I am quite happy with it.
         However, there's much more that could be done to improve it. One obvious change would be to work on the
-        machine learning model. I would stick with a convolutional neural network, but as recent research has
-        shown, one can get accuracies as high as
+        machine learning model. I would stick with a CNN, but as recent research has shown, one can get accuracies
+        as high as
         <a href="http://rodrigob.github.io/are_we_there_yet/build/classification_datasets_results.html#4d4e495354" target="_blank">99.79%</a>
         with state-of-the-art models. Additionally, more sophisticated handling of the fact that the output is
         always a digit class could also improve performance. One example would be to examine all output probabilities,
         rather than only looking at the top class. This would be particularly helpful with situations in which the top
-        class probability is not very high. One other interesting change would be to collect the images drawn by users
+        class probability is not very high.
+        </p>
+        
+        <p>One other interesting change would be to collect the images drawn by users
         in a database, along with the user selected class, and then train the model on those images as well. This would
         allow the collection of relevant data, with the potential to significantly improve performance.
 		</p>
