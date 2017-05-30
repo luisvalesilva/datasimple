@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<!--
+	Based on the template 'Retrospect', by TEMPLATED
+	Template released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+
+	Content by Luis Vale Silva
+-->
+<html lang="en">
+	<head>
+		<title>Data simple - Random Forests</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content="An exploration of word clouds using Andreas
+		Mueller's word_cloud Python library.">
+		<meta name="keywords" content="data science, data analysis, data visualization,
+		python, scikit-learn, machine learning, random forests, decision trees">
+		<meta name="author" content="Luis Vale Silva">
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+		<link rel="icon" href="images/datasimple_favicon.ico" type="image/x-icon">
+		 <link rel="stylesheet" href="assets/css/prism.css">
+		 <script src="assets/js/prism.js"></script>
+
+		 <!-- Google Analytics -->
+		<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-71624249-1', 'auto');
+  ga('send', 'pageview');
+  </script>
+
+	</head>
+	<body>
+
+	<!-- Header -->
+	<header id="header" class="skel-layers-fixed">
+		<h1><a href="index.html">Home</a></h1>
+	</header>
+
+	<!-- Main -->
+	<section id="main" class="wrapper">
+		<div class="container">
+			<header class="major special">
+				<h4><b>May 2017</b></h4>
+				<h2>Random Forests</h2>
+        <h3>Growing a forest of random Decision Trees with scikit-learn</h3>
+			</header>
+        <center>
+            <p><font size="4" color="black">Full code on
+            <font size="6"><a href="https://github.com/luisvalesilva/random_forests" target="_blank" class="icon fa-github"></a></font></font>
+            </p>
+        </center>
+        <br />
+        <p><i>Random Forests</i> are a popular example of an <i>Ensemble Learning</i> method. Ensemble Learning consists on combining multiple machine learning (ML) models in order to achieve higher predictive performance than could be obtained using either of the individual models alone. Ensemble Learning methods work best when the models are as diverse as possible, providing complementary predictive performance. One way to achieve this is to combine models built using different ML algorithms, to try to leverage the different strength of models making errors on different training set instances. An alternative approach is to use the same ML algorithm, but to train each model on a different random subset of the training data set. This is the appproach taken by Random Forests: they combine multiple <i>Decision Tree</i> models trained on different subsets of the training data.</p>
+          
+        <p>I will start by taking a closer look at the Decision Tree ML algorithm, which is at the core of Random Forests. But before moving on, let's generate some toy data using <a href="http://scikit-learn.org/stable/" target="_blank">scikit-learn</a>'s <code1>make_blobs</code1> function. Let's make it a two-dimensional data set, in order to allow easy visualization. There will be, say, 300 observations evenly split between three classes, "Yellow", "Blue", and "Red". I'll use a high-enough standard deviation (parameter <code1>cluster_std</code1>) to blur out the class boundaries a little bit.</p>
+
+        <pre>
+            <code class="language-python">
+import matplotlib.pyplot as plt
+
+# Generate data
+from sklearn.datasets import make_blobs
+X, y = make_blobs(n_samples=300, n_features=2, centers=3,
+                  cluster_std=4, random_state=42)
+
+# Plot data
+plt.plot(X[:, 0][y==0], X[:, 1][y==0], "yo", marker='.')
+plt.plot(X[:, 0][y==1], X[:, 1][y==1], "bs", marker='.')
+plt.plot(X[:, 0][y==2], X[:, 1][y==2], "rd", marker='.')
+plt.xlabel(r"$x_1$", fontsize=20)
+plt.ylabel(r"$x_2$", fontsize=20, rotation=0)
+plt.title("Toy data set\n", fontsize=16)</code>
+        </pre></br>
+
+    	<!-- Image -->
+        <center>
+            <div class="8u"><span class="image fit"><img src="images/random_forests/toy_data.png" alt="word cloud" /></span></div>
+		</center>
+
+        <header>
+            <h3>1. Decision Trees</h3>
+            <h4>1.1 Making predictions</h4>
+        </header>
+        <p>Decision Trees are powerful ML algorithms capable of fitting complex data sets. The Wikipedia page on <a href="https://en.wikipedia.org/wiki/Decision_tree_learning" target="_blank">Decision Tree Learning</a> presents the following definition:</p>
+        
+        <blockquote>A decision tree is a flow-chart-like structure, where each internal (non-leaf) node denotes a test on an attribute, each branch represents the outcome of a test, and each leaf (or terminal) node holds a class label. The topmost node in a tree is the root node.</blockquote>
+
+        <p>In order to classify a data instance, all you need to do is traverse the flow chart, answering all the tests, until you reach a leaf node. Each test will be a question conerning a specific feature in the data. The class labeling of the leaf node the new instance ends up in is the predicted class. Let's grow a Decision Tree on our data to take a closer look at how this works in practice. scikit-learn makes this ridiculously easy, of course.</p>
+
+        <pre>
+            <code class="language-python">
+from sklearn.tree import DecisionTreeClassifier
+
+# Instantiate the classifier class
+tree_clf = DecisionTreeClassifier(max_depth=2, random_state=42)
+
+# Grow a Decision Tree
+tree_clf.fit(X, y)</code>
+        </pre></br>
+
+        <p>We have grown a tree on our 2-D data set. Classifying new examples is simple. Let's make up a couple of examples to try the classifier.</p>
+
+        <pre>
+            <code class="language-python">
+import numpy as np
+
+def predict_class(data_point, classes=['Yellow', 'Blue', 'Red']):
+    # Convert to appropriate numpy array
+    data_point = np.array(data_point).reshape(1, -1)
+    
+    # Classify
+    result = tree_clf.predict(data_point)
+    
+    # Print output
+    print('Predicted class for point {}: {}'.format(data_point,
+                                                    classes[np.asscalar(result)]))
+    
+predict_class([-5, 10])
+predict_class([10, 5])
+predict_class([-10, -10])</code>
+        </pre></br>
+
+        <p>This generates the following output</p>
+        <ul>
+            <li>Predicted class for point [[-5 10]]: Yellow</li>
+            <li>Predicted class for point [[10  5]]: Blue</li>
+            <li>Predicted class for point [[-10 -10]]: Red</li>
+        </ul>
+ 
+        <p>If you check the location of the points visually in the plot of the feature space you will see that these predictions make sense.</p>
+
+        <header>
+            <h4>1.2 "Growing" a Decision Tree model</h4>
+        </header>
+
+
+        <pre>
+        <code class="language-bash">
+wget http://www.gutenberg.org/ebooks/8117.txt.utf-8 -O ThePossessed.txt</code>
+        </pre></br>
+
+
+
+
+
+        </div>
+  </section>
+  <!-- Footer -->
+  <footer id="footer">
+    <div class="inner">
+      <font size="1">
+        <ul class="copyright">
+          <li>&copy; Data simple</li>
+          <li></li><li></li>
+	  <li>Hosted on <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.</li>
+          <li></li><li></li>
+          <li>Design based on 'Retrospect' from <a href="http://templated.co" target="_blank" >TEMPLATED</a>.</li>
+        </ul></font>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/skel.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+    <script src="assets/js/main.js"></script>
+
+		<!-- GetSiteControl.com widgets -->
+		<script>
+		(function (w,i,d,g,e,t,s) {w[d] = w[d]||[];t= i.createElement(g);
+			t.async=1;t.src=e;s=i.getElementsByTagName(g)[0];s.parentNode.insertBefore(t, s);
+		})(window, document, '_gscq','script','//widgets.getsitecontrol.com/49202/script.js');
+		</script>
+  </body>
+</html>
