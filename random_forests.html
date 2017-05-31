@@ -34,6 +34,10 @@
   ga('send', 'pageview');
   </script>
 
+        <!-- Mathjax -->
+        <script type="text/javascript" async
+            src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+        </script>
 	</head>
 	<body>
 
@@ -80,7 +84,7 @@ plt.title("Toy data set\n", fontsize=16)</code>
 
     	<!-- Image -->
         <center>
-            <div class="8u"><span class="image fit"><img src="images/random_forests/toy_data.png" alt="word cloud" /></span></div>
+            <div class="8u"><span class="image fit"><img src="images/random_forests/toy_data.png" alt="Toy data" /></span></div>
 		</center>
 
         <header>
@@ -124,28 +128,92 @@ def predict_class(data_point, classes=['Yellow', 'Blue', 'Red']):
 predict_class([-5, 10])
 predict_class([10, 5])
 predict_class([-10, -10])</code>
+        </pre>
+
+        <pre><code>
+Predicted class for point [[-5 10]]: Yellow
+Predicted class for point [[10  5]]: Blue
+Predicted class for point [[-10 -10]]: Red
+</code></pre><br />
+ 
+        <p>If you check the location of the points visually in the plot of the feature space above you will see that these predictions make sense. We can visualize the Decision Tree model to inspect its structure and see how it makes decisions. We can use the <code1>dot</code1> tool in the <a href="http://www.graphviz.org/" target="_blank">graphviz</a> package. We start by generating a graph definition as a <code1>.dot</code1> file, using the <code1>export_graphviz</code1> method.</p>
+
+        <pre>
+            <code class="language-python">
+from sklearn.tree import export_graphviz
+
+export_graphviz(tree_clf, out_file='tree.dot',
+                feature_names=['x1', 'x2'],
+                class_names=['Yellow', 'Blue', 'Red'],
+                rounded=True, filled=True)</code>
+        </pre>
+
+        <p>We can then convert the <code1>.dot</code1> file to a <code1>.png</code1> image file and visualize the tree structure.</p>
+ 
+        <pre>
+        <code class="language-bash">
+dot -Tpng tree.dot -o tree.png</code>
         </pre></br>
 
-        <p>This generates the following output</p>
-        <ul>
-            <li>Predicted class for point [[-5 10]]: Yellow</li>
-            <li>Predicted class for point [[10  5]]: Blue</li>
-            <li>Predicted class for point [[-10 -10]]: Red</li>
-        </ul>
- 
-        <p>If you check the location of the points visually in the plot of the feature space you will see that these predictions make sense.</p>
+    	<!-- Image -->
+        <center>
+            <div class="8u"><span class="image fit"><img src="images/random_forests/tree.png" alt="Tree" /></span></div>
+		</center>
+        
+        <p>We can now see the exact way the model predicts new instance classes. At the root node we find all 300 training examples split evenly between the three classes. The tree asks whether the value of feature \(x2\) is lower than or equal to \(−1.3707\). It splits the data in two groups according to the answer and then goes on to ask another question in each of the two following internal nodes. These, in turn, split the data between two groups each. Since we set argument <code1>max_depth=2</code1>, the tree stops here, with four leaf nodes providing the final prediction.</p>
+
+        <p>Let's use one of the instances predicted above as an example: \(x1=−5, x2=10\). The answer to the root node question is <code1>False</code1>, since \(x2 > −1.3707\). The answer to the next question is <code1>True</code1>, since \(x1 <= 0.8566\). This brings us to the leaf node predicting class "Yellow".</p>
+
+        <p>This structure allows Decision Trees to estimate class probabilities by simply computing the ratio of training instances belonging to each class in the leaf node. For example, for our predicted instance above this tree estimates it belongs to class "Yellow" with 84.6% probability (88/104; the predicted class), class "Blue" with 8.7% probability (9/104) and class "Red" with 6.7% probability (7/104).</p>
+
+        <p>These rules define axis-parallel decision boundaries, dividing the feature space into a series rectangles, each of which predicts only one of the classes. Let's define a function to visualize the decision boundaries and a function to plot them, together with the training data, using matplotlib.</p>
+
+
+        <pre>
+            <code class="language-python">
+from matplotlib.colors import ListedColormap
+
+def compute_decision_boundaries(clf, X, y, axes):
+    x1s = np.linspace(axes[0], axes[1], 300)
+    x2s = np.linspace(axes[2], axes[3], 300)
+    x1, x2 = np.meshgrid(x1s, x2s)
+    X_new = np.c_[x1.ravel(), x2.ravel()]
+    y_pred = clf.predict(X_new).reshape(x1.shape)
+    
+    return x1, x2, y_pred
+
+def plot_feature_space(clf, X, y, axes, file_name=None):
+    x1, x2, y_pred = compute_decision_boundaries(clf, X, y, axes)
+    
+    custom_cmap = ListedColormap(['y','b','r'])
+    plt.contourf(x1, x2, y_pred, cmap=custom_cmap, alpha=0.1, linewidth=1)
+
+    plt.plot(X[:, 0][y==0], X[:, 1][y==0], "yo", marker='.')
+    plt.plot(X[:, 0][y==1], X[:, 1][y==1], "bs", marker='.')
+    plt.plot(X[:, 0][y==2], X[:, 1][y==2], "rd", marker='.')
+    plt.axis(axes)
+    plt.xlabel(r"$x_1$", fontsize=20)
+    plt.ylabel(r"$x_2$", fontsize=20, rotation=0)
+    if file_name is not None:
+        plt.savefig(file_name, dpi=300, bbox_inches='tight')
+    plt.figure(figsize=(8, 4))</code>
+        </pre>
+
+        <p>Now we can plot the decison space for this example.</p>
+        
+        <pre>
+            <code class="language-python">
+plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20], file_name='max_depth2.png')</code>
+        </pre>
+
+    	<!-- Image -->
+        <center>
+            <div class="8u"><span class="image fit"><img src="images/random_forests/max_depth2.png" alt="Max depth 2" /></span></div>
+		</center>
 
         <header>
             <h4>1.2 "Growing" a Decision Tree model</h4>
         </header>
-
-
-        <pre>
-        <code class="language-bash">
-wget http://www.gutenberg.org/ebooks/8117.txt.utf-8 -O ThePossessed.txt</code>
-        </pre></br>
-
-
 
 
 
