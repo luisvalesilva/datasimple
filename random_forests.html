@@ -60,7 +60,7 @@
             </p>
         </center>
         <br />
-        <p><i>Random Forests</i> are a popular example of an <i>Ensemble Learning</i> method. Ensemble Learning consists on combining multiple machine learning (ML) models in order to achieve higher predictive performance than could be obtained using either of the individual models alone. Ensemble Learning methods work best when the models are as diverse as possible, providing complementary predictive performance. One way to achieve this is to combine models built using different ML algorithms, to try to leverage the different strength of models making errors on different training set instances. An alternative approach is to use the same ML algorithm, but to train each model on a different random subset of the training data set. This is the appproach taken by Random Forests: they combine multiple <i>Decision Tree</i> models trained on different subsets of the training data.</p>
+        <p><i>Random Forests</i> are a popular example of an <i>Ensemble Learning</i> method. Ensemble Learning consists on combining multiple machine learning (ML) models in order to achieve higher predictive performance than could be obtained using either of the individual models alone. Ensemble Learning methods work best when the models are as diverse as possible, providing complementary predictive performance. One way to achieve this is to combine models built using different ML algorithms, to leverage their complementary strengths. An alternative approach is to use the same ML algorithm, but to train each model on a different random subset of the training data set. This is the appproach taken by Random Forests: they combine multiple <i>Decision Tree</i> models trained on different subsets of the training data.</p>
           
         <p>I will start by taking a closer look at the Decision Tree ML algorithm, which is at the core of Random Forests. But before moving on, let's generate some toy data using <a href="http://scikit-learn.org/stable/" target="_blank">scikit-learn</a>'s <code1>make_blobs</code1> function. Let's make it a two-dimensional data set, in order to allow easy visualization. There will be, say, 300 observations evenly split between three classes, "Yellow", "Blue", and "Red". I'll use a high-enough standard deviation (parameter <code1>cluster_std</code1>) to blur out the class boundaries a little bit.</p>
 
@@ -136,7 +136,7 @@ Predicted class for point [[10  5]]: Blue
 Predicted class for point [[-10 -10]]: Red
 </code></pre><br />
  
-        <p>If you check the location of the points visually in the plot of the feature space above you will see that these predictions make sense. We can visualize the Decision Tree model to inspect its structure and see how it makes decisions. We can use the <code1>dot</code1> tool in the <a href="http://www.graphviz.org/" target="_blank">graphviz</a> package. We start by generating a graph definition as a <code1>.dot</code1> file, using the <code1>export_graphviz</code1> method.</p>
+        <p>If you check the location of the points visually in the plot above you will see that these predictions make sense. We can visualize the Decision Tree model to inspect its structure and see how it makes decisions. We can use the <code1>dot</code1> tool in the <a href="http://www.graphviz.org/" target="_blank">graphviz</a> package. We start by generating a graph definition as a <code1>.dot</code1> file, using the <code1>export_graphviz</code1> method.</p>
 
         <pre>
             <code class="language-python">
@@ -184,13 +184,7 @@ def compute_decision_boundaries(clf, X, y, axes):
 
 def plot_feature_space(clf, X, y, axes, file_name=None):
     x1, x2, y_pred = compute_decision_boundaries(clf, X, y, axes)
-    
-    custom_cmap = ListedColormap(['y','b','r'])
-    plt.contourf(x1, x2, y_pred, cmap=custom_cmap, alpha=0.1, linewidth=1)
-
-    plt.plot(X[:, 0][y==0], X[:, 1][y==0], "yo", marker='.')
-    plt.plot(X[:, 0][y==1], X[:, 1][y==1], "bs", marker='.')
-    plt.plot(X[:, 0][y==2], X[:, 1][y==2], "rd", marker='.')
+    custom_cmap = ListedColormap(['y','b','r']) plt.contourf(x1, x2, y_pred, cmap=custom_cmap, alpha=0.1, linewidth=1) plt.plot(X[:, 0][y==0], X[:, 1][y==0], "yo", marker='.') plt.plot(X[:, 0][y==1], X[:, 1][y==1], "bs", marker='.') plt.plot(X[:, 0][y==2], X[:, 1][y==2], "rd", marker='.')
     plt.axis(axes)
     plt.xlabel(r"$x_1$", fontsize=20)
     plt.ylabel(r"$x_2$", fontsize=20, rotation=0)
@@ -215,7 +209,42 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20], file_name='max_depth
             <h4>1.2 "Growing" a Decision Tree model</h4>
         </header>
 
+        <p>So this is how a Decision Tree model makes predictions. But how can we actually grow the tree? There are alternatives, but scikit-learn uses the <i>Classification And Regression Tree</i> (CART) algorithm. CART works by splitting the training set in two subsets using a single feature \(k\) and a threshold \(t_k\), such that the split produces the purest subsets (weighted by their size). This is called the <i>splitting rule</i>. It then splits the subsets in the same exact way, then the sub-subsets and so on, recursively, until it cannot find a split to reduce class impurity. This is known as contructing the <i>maximum tree</i>. The CART algorithm minimizes the following cost function at each split:</p>
 
+        $$ J(k, t_k) = \dfrac{m_{left}}{m}I_{left} + \dfrac{m_{right}}{m}I_{right} $$
+
+        $$
+        with
+        \begin{cases}
+            I_{left/right} \text{ impurity of the left/right subset,}\\
+            m_{left/right} \text{ number of instances in the left/right subset.}
+        \end{cases}
+        $$
+
+        <p>So what is the impurity \(I\) measure? Typically, this will be the <i>Gini impurity</i> measure. Formally:</p>
+
+        $$ I_G(t) =  1 - \sum_{k=1}^K p_{k,t}^2 $$
+
+        $$
+        with
+        \begin{cases}
+            k \bbox[3pt]{1, . . . , K} \text{ index of the class,}\\
+            p_{k,t} \text{ ratio of class $k$ instances among the training instances in node $t$}
+        \end{cases}
+        $$
+
+        <p>In other words, the Gini impurity measures the probability that a randomly chosen instance from the node would be incorrectly labeled if it was randomly labeled according to the distribution of classes in the node. It does this by first computing the probability \(p_{k,t}\) that a randomly chosen instance from the subset of training instances in the node \(t\) belongs to class \(k\) (simply the ratio of class \(k\) instances). It multiplies this probability by itself, which yields the probability \(p_{k,t}^2\) that that instance would be correctly labeled if it was randomly labeled according to the distribution of classes in the node (again, simply the ratio of class \(k\) instances). It then sums up the probabilities across all classes \(K\) and finally computes the probability that the instance would be incorrectly classified by subtracting the previous probability from the unity. The Gini impurity is thus reduced to zero when the node is pure, i.e. all instances in the node belong to the same class, since in that case \(p_{k,t} = 1\) for the represented class (and 0 for all others) and thus \(p_{k,t}^2 = 1\), resulting in \(I_G(t) = 1 - 1 = 0\).</p>
+
+        <p>You can now go back to the image of the tree structure and check the "gini" attribute at each node. Let's take, for example, the purple leaf node \(t=4\). Using the definition above, we can calculate the Gini impurity at this is node and get the indicated value of \(0.0425\):</p>
+
+        $$ I_G(2) =  1 - \sum_{k=1}^K p_{k,2}^2 = \\
+        = 1 - \left( {\left(\dfrac{0}{92}\right)}^2 + {\left(\dfrac{2}{92}\right)}^2 + {\left(\dfrac{90}{92}\right)}^2 \right) =\\
+        = 1 - ( 0 + 0.00047 + 0.95699 ) =\\
+        = 0.0425 $$
+
+        <p>This is quite a pure node, since 97.8% of the observations belong to the same class ("Red"). Its Gini impurity measure is consequently very low. An alternative is to use the <i>Information gain</i> measure, based on the concept of <i>entropy</i> from information theory. In scikit-learn you can use this measure by changing <code1>criterion='entropy'</code1> instead of <code1>'gini'</code1> when you instantiate the <code1>DecisionTreeClassifier</code1>.</p>
+
+        <p>Decision Trees have the ability to adapt very closely to the training data. They are <i>non-parametric models</i>, since the number of parameters is not predetermined and will thus grow during traning. This means that they have a tendency to produce high-variance models that will not generalize well to classification of new, previously unseen, instances. This is known as overfitting the training data. For this reason, regularization is very important when training Decision Tree models. Decision Trees have several regularization hyperparameters. Different implementations will, at the very least, allow you to constrain the tree depth. You may have noticed that I have used that above, by instantiating the <code1>DecisionTreeClassifier</code1> with argument <code1>max_depth=2</code1>. This was mainly to generate a small tree that was easy to visualize. The result was arguably an underfitting model that could be improved. Here is what it looks like using <code1>max_depth=3</code1>.</p>
 
         </div>
   </section>
