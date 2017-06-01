@@ -84,7 +84,7 @@ plt.title("Toy data set\n", fontsize=16)</code>
 
     	<!-- Image -->
         <center>
-            <div class="8u"><span class="image fit"><img src="images/random_forests/toy_data.png" alt="Toy data" /></span></div>
+            <div class="7u"><span class="image fit"><img src="images/random_forests/toy_data.png" alt="Toy data" /></span></div>
 		</center>
 
         <header>
@@ -202,7 +202,7 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
 
     	<!-- Image -->
         <center>
-            <div class="8u"><span class="image fit"><img src="images/random_forests/max_depth2.png" alt="Max depth 2" /></span></div>
+            <div class="7u"><span class="image fit"><img src="images/random_forests/max_depth2.png" alt="Max depth 2" /></span></div>
 		</center>
 
         <header>
@@ -259,7 +259,7 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
 
     	<!-- Image -->
         <center>
-            <div class="8u"><span class="image fit"><img src="images/random_forests/max_depth3.png" alt="Max depth 3" /></span></div>
+            <div class="7u"><span class="image fit"><img src="images/random_forests/max_depth3.png" alt="Max depth 3" /></span></div>
 		</center>
 
         <p>If left unconstrained the algorithm tries hard to fit the data, learning every single data point's class and thus producing an overcomplicated model.</p>
@@ -277,7 +277,7 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
 
     	<!-- Image -->
         <center>
-            <div class="8u"><span class="image fit"><img src="images/random_forests/unlimited.png" alt="Unconstrained" /></span></div>
+            <div class="7u"><span class="image fit"><img src="images/random_forests/unlimited.png" alt="Unconstrained" /></span></div>
         </center>
 
         <p>Additional regularization parameters provided by scikit-learn are the minimum number of instances in a node before it can be split, the minimum number of instances in a leaf node, the maximum number of leaf nodes, and the maximum number of features that are evaluated for each split.</p>
@@ -308,7 +308,7 @@ plot_feature_space(bag_clf, X, y, axes=[-16, 15, -20, 20])</code>
 
     	<!-- Image -->
         <center>
-            <div class="8u"><span class="image fit"><img src="images/random_forests/bagging.png" alt="Bagging" /></span></div>
+            <div class="7u"><span class="image fit"><img src="images/random_forests/bagging.png" alt="Bagging" /></span></div>
         </center>
 
         <p>The decision boundaries look much smoother and definitely seem like they will generalize much better. An interesting side-effect of the bagging procedure is that a subset of the instances will not be sampled during training, the so-called <i>out-of-bag</i> instances. The model will not have seen the out-of-bag instances at all during training and so they can actually be used as a test set, in a procedure known as <i>Out-of-bag Evaluation</i>. Parameter <code1>oob_score=True</code1> above tells scikit-learn to perform Out-of-bag Evaluation after training and we can now use the attribute <code1>oob_score_</code1> to check the score.</p>
@@ -341,7 +341,7 @@ plot_feature_space(rf_clf, X, y, axes=[-16, 15, -20, 20])</code>
 
     	<!-- Image -->
         <center>
-            <div class="8u"><span class="image fit"><img src="images/random_forests/random_forest.png" alt="Random Forest" /></span></div>
+            <div class="7u"><span class="image fit"><img src="images/random_forests/random_forest.png" alt="Random Forest" /></span></div>
         </center>
 
         <pre>
@@ -372,7 +372,7 @@ plot_feature_space(extra_clf, X, y, axes=[-16, 15, -20, 20])</code>
 
     	<!-- Image -->
         <center>
-            <div class="8u"><span class="image fit"><img src="images/random_forests/extra_trees.png" alt="Extra Trees" /></span></div>
+            <div class="7u"><span class="image fit"><img src="images/random_forests/extra_trees.png" alt="Extra Trees" /></span></div>
         </center>
 
         <pre>
