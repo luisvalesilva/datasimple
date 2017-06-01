@@ -171,24 +171,24 @@ dot -Tpng tree.dot -o tree.png</code>
 
         <pre>
             <code class="language-python">
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import listedcolormap
 
-def compute_decision_boundaries(clf, X, y, axes):
+def compute_decision_boundaries(clf, x, y, axes):
     x1s = np.linspace(axes[0], axes[1], 300)
     x2s = np.linspace(axes[2], axes[3], 300)
     x1, x2 = np.meshgrid(x1s, x2s)
-    X_new = np.c_[x1.ravel(), x2.ravel()]
-    y_pred = clf.predict(X_new).reshape(x1.shape)
+    x_new = np.c_[x1.ravel(), x2.ravel()]
+    y_pred = clf.predict(x_new).reshape(x1.shape)
     
     return x1, x2, y_pred
 
-def plot_feature_space(clf, X, y, axes, file_name=None):
-    x1, x2, y_pred = compute_decision_boundaries(clf, X, y, axes)
-    custom_cmap = ListedColormap(['y','b','r']) plt.contourf(x1, x2, y_pred, cmap=custom_cmap, alpha=0.1, linewidth=1) plt.plot(X[:, 0][y==0], X[:, 1][y==0], "yo", marker='.') plt.plot(X[:, 0][y==1], X[:, 1][y==1], "bs", marker='.') plt.plot(X[:, 0][y==2], X[:, 1][y==2], "rd", marker='.')
+def plot_feature_space(clf, x, y, axes, file_name=none):
+    x1, x2, y_pred = compute_decision_boundaries(clf, x, y, axes)
+    custom_cmap = listedcolormap(['y','b','r']) plt.contourf(x1, x2, y_pred, cmap=custom_cmap, alpha=0.1, linewidth=1) plt.plot(x[:, 0][y==0], x[:, 1][y==0], "yo", marker='.') plt.plot(x[:, 0][y==1], x[:, 1][y==1], "bs", marker='.') plt.plot(x[:, 0][y==2], x[:, 1][y==2], "rd", marker='.')
     plt.axis(axes)
     plt.xlabel(r"$x_1$", fontsize=20)
     plt.ylabel(r"$x_2$", fontsize=20, rotation=0)
-    if file_name is not None:
+    if file_name is not none:
         plt.savefig(file_name, dpi=300, bbox_inches='tight')
     plt.figure(figsize=(8, 4))</code>
         </pre>
@@ -197,7 +197,7 @@ def plot_feature_space(clf, X, y, axes, file_name=None):
         
         <pre>
             <code class="language-python">
-plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20], file_name='max_depth2.png')</code>
+plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
         </pre>
 
     	<!-- Image -->
@@ -242,9 +242,150 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20], file_name='max_depth
         = 1 - ( 0 + 0.00047 + 0.95699 ) =\\
         = 0.0425 $$
 
-        <p>This is quite a pure node, since 97.8% of the observations belong to the same class ("Red"). Its Gini impurity measure is consequently very low. An alternative is to use the <i>Information gain</i> measure, based on the concept of <i>entropy</i> from information theory. In scikit-learn you can use this measure by changing <code1>criterion='entropy'</code1> instead of <code1>'gini'</code1> when you instantiate the <code1>DecisionTreeClassifier</code1>.</p>
+        <p>This is quite a pure node, since 97.8% of the observations belong to the same class ("Red"). Its Gini impurity measure is consequently very low. An alternative is to use the <i>Information gain</i> measure, based on the concept of <i>entropy</i> from information theory. In scikit-learn you can use this measure by instantiating the <code1>DecisionTreeClassifier</code1> with <code1>criterion='entropy'</code1> instead of <code1>'gini'</code1>.</p>
 
         <p>Decision Trees have the ability to adapt very closely to the training data. They are <i>non-parametric models</i>, since the number of parameters is not predetermined and will thus grow during traning. This means that they have a tendency to produce high-variance models that will not generalize well to classification of new, previously unseen, instances. This is known as overfitting the training data. For this reason, regularization is very important when training Decision Tree models. Decision Trees have several regularization hyperparameters. Different implementations will, at the very least, allow you to constrain the tree depth. You may have noticed that I have used that above, by instantiating the <code1>DecisionTreeClassifier</code1> with argument <code1>max_depth=2</code1>. This was mainly to generate a small tree that was easy to visualize. The result was arguably an underfitting model that could be improved. Here is what it looks like using <code1>max_depth=3</code1>.</p>
+
+        <pre>
+            <code class="language-python">
+# Instantiate the classifier class for a deeper tree 
+tree_clf = DecisionTreeClassifier(max_depth=3, random_state=42)
+
+# Grow a Decision Tree
+tree_clf.fit(X, y)
+
+plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
+        </pre>
+
+    	<!-- Image -->
+        <center>
+            <div class="8u"><span class="image fit"><img src="images/random_forests/max_depth3.png" alt="Max depth 3" /></span></div>
+		</center>
+
+        <p>If left unconstrained the algorithm tries hard to fit the data, learning every single data point's class and thus producing an overcomplicated model.</p>
+        
+        <pre>
+            <code class="language-python">
+# Instantiate the classifier class with no limits
+tree_clf = DecisionTreeClassifier(random_state=42)
+
+# Grow a Decision Tree
+tree_clf.fit(X, y)
+
+plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
+        </pre>
+
+    	<!-- Image -->
+        <center>
+            <div class="8u"><span class="image fit"><img src="images/random_forests/unlimited.png" alt="Unconstrained" /></span></div>
+        </center>
+
+        <p>Additional regularization parameters provided by scikit-learn are the minimum number of instances in a node before it can be split, the minimum number of instances in a leaf node, the maximum number of leaf nodes, and the maximum number of features that are evaluated for each split.</p>
+
+        <p>Decision Trees can also be used for regression problems, instead of classification, with very minor changes. The tree is grown in the same way, using the CART algorithm, except that instead of minimizing node impurity it minimizes the mean squared error (MSE). It then simply predicts the average value of all data observations at each node, instead of the most common class.</p>
+
+        <header>
+            <h3>2. Random Forests</h3>
+            <h4>2.1 Building an ensemble of Decision Trees</h4>
+        </header>
+
+        <p>An ensemble of Decision Trees is called a <i>Random Forest</i>. Random Forests are an example of an ensemble using the same ML algorithm to build multiple models each trained on a different random subset of the training data. When the training data sampling for each predictor is performed with replacement, the method is called <i>Boosted aggregating</i>, commonly abbreviated to <i>Bagging</i>. Sampling without replacement is called <i>Pasting</i>. After growing the Random Forest, i.e. training the chosen number of Decision Trees, the individual Decision Trees vote to reach the final prediction. Voting can be done in two ways, called <i>hard voting</i> and <i>soft voting</i>. Hard voting consists using the statistical mode of the predicted classes, i.e. the most commonly predicted class. Soft voting consists on outputing the highest class probability, averaged over all the individual classifiers. This, of course, requires that the predictors can estimate class probabilities.</p>
+
+        <p>The final result is typically a model with similar bias but a lower variance than a single Decision Tree trained on the same data. This means that the decision boundary is less irregular. Let's see what that looks like by using scikit-kearn's <code1>BaggingClassifier</code1> to grow a Random Forest. Let's grow, say, 50 Decision Trees, each trained on a random sample of 50 training set instances. scikit-learn also allows us to parallelize the work, with the <code1>n_jobs</code1> parameter. This is another nice side-effect of the algorithm: the individual predictors can be trained completely independently of each other. Let's set <code1>n_jobs=-1</code1>, which evaluates to the number of available cores.</p>
+
+        <pre>
+            <code class="language-python">
+from sklearn.ensemble import BaggingClassifier
+
+bag_clf = BaggingClassifier(DecisionTreeClassifier(), n_estimators=50,
+                            max_samples=50, bootstrap=True, n_jobs=-1,
+                            oob_score=True, random_state=42)
+
+bag_clf.fit(X, y)
+
+plot_feature_space(bag_clf, X, y, axes=[-16, 15, -20, 20])</code>
+        </pre>
+
+    	<!-- Image -->
+        <center>
+            <div class="8u"><span class="image fit"><img src="images/random_forests/bagging.png" alt="Bagging" /></span></div>
+        </center>
+
+        <p>The decision boundaries look much smoother and definitely seem like they will generalize much better. An interesting side-effect of the bagging procedure is that a subset of the instances will not be sampled during training, the so-called <i>out-of-bag</i> instances. The model will not have seen the <i>out-of-bag</i> instances at all during training and so they can actually be used as a test set, in a procedure known as <i>Out-of-bag Evaluation</i>. Parameter <code1>oob_score=True</code1> above tells scikit-learn to perform Out-of-bag Evaluation after training and we can now use the attribute <code1>oob_score_</code1> to check the score.</p>
+
+        <pre>
+            <code class="language-python">
+print('Out-of-bag evaluation score: {}%'.format(round(bag_clf.oob_score_, 4) * 100))</code>
+        </pre>
+
+        <pre><code>
+Out-of-bag evaluation score: 91.0%</code></pre><br />
+
+        <header>
+        <h4>2.2 The Random Forest Classifier class</h4>
+        </header>
+
+        <p>As you may know, scikit-learn actually has a <code1>RandomForestClassifier</code1> class, so you can leave the bagging classifier class to use when you're bagging other models for your custom-built ensembles. This class will train a Random Forest using the specified number of Decision Trees using the whole training set for each individual model. One other main difference compared to the bagging classifier built above is that it introduces additional randomness by using a random subset of the features at each split, as well as a random subset of the data. This favors lower variance (and higher bias), helping with the tendency of the trees to overfit the data. Let's build a Random Forest with the <code1>RandomForestClassifier</code1> class and an additional regularization hyperparameter by setting <code1>max_leaf_nodes=10</code1>.</p>
+
+        <pre>
+            <code class="language-python">
+from sklearn.ensemble import RandomForestClassifier
+
+rf_clf = RandomForestClassifier(n_estimators=50, max_leaf_nodes=10, n_jobs=-1,
+                                bootstrap=True, oob_score=True, random_state=42)
+
+rf_clf.fit(X, y)
+
+plot_feature_space(rf_clf, X, y, axes=[-16, 15, -20, 20])</code>
+        </pre>
+
+    	<!-- Image -->
+        <center>
+            <div class="8u"><span class="image fit"><img src="images/random_forests/random_forest.png" alt="Random Forest" /></span></div>
+        </center>
+
+        <pre>
+            <code class="language-python">
+print('Out-of-bag evaluation score: {}%'.format(round(rf_clf.oob_score_, 4) * 100))</code>
+        </pre>
+
+        <pre><code>
+Out-of-bag evaluation score: 91.33%</code></pre><br />
+
+        <header>
+        <h3>3. Extremely Randomized Trees</h3>
+        </header>
+
+        <p>There is yet another tree-based ensemble algorithm implementation in scikit-learn introducing additional randomness: the <i>Extremely Randomized Trees</i> ensemble or <i>Extra-Trees</i>. Besides considering only a subset of the data set at each node, the Extra-Tree algorithm uses random splitting thresholds for each feature, rather than searching for the best threshold, to make its Decision Tree predictors even more random. Here's what it looks like with our toy data.</p>
+
+        <pre>
+            <code class="language-python">
+from sklearn.ensemble import ExtraTreesClassifier
+
+extra_clf = ExtraTreesClassifier(n_estimators=50, max_leaf_nodes=10, n_jobs=-1,
+                                 bootstrap=True, oob_score=True, random_state=42)
+
+extra_clf.fit(X, y)
+
+plot_feature_space(extra_clf, X, y, axes=[-16, 15, -20, 20])</code>
+        </pre>
+
+    	<!-- Image -->
+        <center>
+            <div class="8u"><span class="image fit"><img src="images/random_forests/extra_trees.png" alt="Extra Trees" /></span></div>
+        </center>
+
+        <pre>
+            <code class="language-python">
+print('Out-of-bag evaluation score: {}%'.format(round(extra_clf.oob_score_, 4) * 100))</code>
+        </pre>
+
+        <pre><code>
+Out-of-bag evaluation score: 92.0%</code></pre><br />
+        
+        <p>The decision boundaries look even more natural, right?</p>
+
+        <p>That's it for this overview of Random Forests. I hope this helped you get adeeper undrerstanding of Decision Trees, Ensemble Learning, and Random Forests.</p>
 
         </div>
   </section>
