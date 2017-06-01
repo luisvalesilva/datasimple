@@ -60,9 +60,9 @@
             </p>
         </center>
         <br />
-        <p><i>Random Forests</i> are a popular example of an <i>Ensemble Learning</i> method. Ensemble Learning consists on combining multiple machine learning (ML) models in order to achieve higher predictive performance than could be obtained using either of the individual models alone. Ensemble Learning methods work best when the models are as diverse as possible, providing complementary predictive performance. One way to achieve this is to combine models built using different ML algorithms, to leverage their complementary strengths. An alternative approach is to use the same ML algorithm, but to train each model on a different random subset of the training data set. This is the appproach taken by Random Forests: they combine multiple <i>Decision Tree</i> models trained on different subsets of the training data.</p>
+        <p><i>Random Forests</i> are a popular example of an <i>Ensemble Learning</i> method. Ensemble Learning consists on combining multiple machine learning (ML) models in order to achieve higher predictive performance than could be obtained using either of the individual models alone. Ensemble Learning methods work best when the models are as diverse as possible, providing complementary predictive performance. One way to achieve this is to combine models built using different ML algorithms, to leverage their diverse strengths. An alternative approach is to use the same ML algorithm, but to train each model on a different random subset of the training data. This is the appproach taken by Random Forests: they combine multiple <i>Decision Tree</i> models trained on random subsets of the training data.</p>
           
-        <p>I will start by taking a closer look at the Decision Tree ML algorithm, which is at the core of Random Forests. But before moving on, let's generate some toy data using <a href="http://scikit-learn.org/stable/" target="_blank">scikit-learn</a>'s <code1>make_blobs</code1> function. Let's make it a two-dimensional data set, in order to allow easy visualization. There will be, say, 300 observations evenly split between three classes, "Yellow", "Blue", and "Red". I'll use a high-enough standard deviation (parameter <code1>cluster_std</code1>) to blur out the class boundaries a little bit.</p>
+        <p>In this post I will start by taking a closer look at the Decision Tree ML algorithm and then discuss how you can combine different Decision Tree models to build Random Forests. But before moving on, however, let's generate some toy data using <a href="http://scikit-learn.org/stable/" target="_blank">scikit-learn</a>'s <code1>make_blobs</code1> function. Let's make it a two-dimensional data set, in order to allow easy visualization. There will be, say, 300 observations evenly split between three classes, "Yellow", "Blue", and "Red". I'll use a high-enough standard deviation (parameter <code1>cluster_std</code1>) to blur out the class boundaries a little bit.</p>
 
         <pre>
             <code class="language-python">
@@ -136,7 +136,7 @@ Predicted class for point [[10  5]]: Blue
 Predicted class for point [[-10 -10]]: Red
 </code></pre><br />
  
-        <p>If you check the location of the points visually in the plot above you will see that these predictions make sense. We can visualize the Decision Tree model to inspect its structure and see how it makes decisions. We can use the <code1>dot</code1> tool in the <a href="http://www.graphviz.org/" target="_blank">graphviz</a> package. We start by generating a graph definition as a <code1>.dot</code1> file, using the <code1>export_graphviz</code1> method.</p>
+        <p>If you check the location of the points visually in the plot above you will see that these predictions make sense. Let's visualize the Decision Tree model to inspect its structure and see how it makes decisions. We can use the <code1>dot</code1> tool in the <a href="http://www.graphviz.org/" target="_blank">graphviz</a> package. We start by generating a graph definition as a <code1>.dot</code1> file, using the <code1>export_graphviz</code1> method.</p>
 
         <pre>
             <code class="language-python">
@@ -166,7 +166,7 @@ dot -Tpng tree.dot -o tree.png</code>
 
         <p>This structure allows Decision Trees to estimate class probabilities by simply computing the ratio of training instances belonging to each class in the leaf node. For example, for our predicted instance above this tree estimates it belongs to class "Yellow" with 84.6% probability (88/104; the predicted class), class "Blue" with 8.7% probability (9/104) and class "Red" with 6.7% probability (7/104).</p>
 
-        <p>These rules define axis-parallel decision boundaries, dividing the feature space into a series rectangles, each of which predicts only one of the classes. Let's define a function to visualize the decision boundaries and a function to plot them, together with the training data, using matplotlib.</p>
+        <p>These rules define axis-parallel decision boundaries, dividing the feature space into a series rectangles, each of which predicts only one of the classes. Let's define a function to compute the decision boundaries and a function to plot them, together with the training data, using matplotlib.</p>
 
 
         <pre>
@@ -209,7 +209,7 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
             <h4>1.2 "Growing" a Decision Tree model</h4>
         </header>
 
-        <p>So this is how a Decision Tree model makes predictions. But how can we actually grow the tree? There are alternatives, but scikit-learn uses the <i>Classification And Regression Tree</i> (CART) algorithm. CART works by splitting the training set in two subsets using a single feature \(k\) and a threshold \(t_k\), such that the split produces the purest subsets (weighted by their size). This is called the <i>splitting rule</i>. It then splits the subsets in the same exact way, then the sub-subsets and so on, recursively, until it cannot find a split to reduce class impurity. This is known as contructing the <i>maximum tree</i>. The CART algorithm minimizes the following cost function at each split:</p>
+        <p>So this is how a Decision Tree model makes predictions. But how can we actually grow the tree? There are alternatives, but scikit-learn uses the <i>Classification And Regression Tree</i> (CART) algorithm. CART works by splitting the training set of \(m\) instances in two subsets using a single feature \(k\) and a threshold \(t_k\), such that the split produces the purest subsets (weighted by their size). This is called the <i>splitting rule</i>. It then splits the subsets in the same exact way, then the sub-subsets and so on, recursively, until it cannot find a split to reduce class impurity. This is known as contructing the <i>maximum tree</i>. The CART algorithm minimizes the following cost function at each split:</p>
 
         $$ J(k, t_k) = \dfrac{m_{left}}{m}I_{left} + \dfrac{m_{right}}{m}I_{right} $$
 
@@ -221,7 +221,7 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
         \end{cases}
         $$
 
-        <p>So what is the impurity \(I\) measure? Typically, this will be the <i>Gini impurity</i> measure. Formally:</p>
+        <p>So what is the impurity \(I\) measure? Typically, this will be the <i>Gini impurity</i>. Formally:</p>
 
         $$ I_G(t) =  1 - \sum_{k=1}^K p_{k,t}^2 $$
 
@@ -237,12 +237,12 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
 
         <p>You can now go back to the image of the tree structure and check the "gini" attribute at each node. Let's take, for example, the purple leaf node \(t=4\). Using the definition above, we can calculate the Gini impurity at this is node and get the indicated value of \(0.0425\):</p>
 
-        $$ I_G(2) =  1 - \sum_{k=1}^K p_{k,2}^2 = \\
+        $$ I_G(4) =  1 - \sum_{k=1}^K p_{k,4}^2 = \\
         = 1 - \left( {\left(\dfrac{0}{92}\right)}^2 + {\left(\dfrac{2}{92}\right)}^2 + {\left(\dfrac{90}{92}\right)}^2 \right) =\\
         = 1 - ( 0 + 0.00047 + 0.95699 ) =\\
         = 0.0425 $$
 
-        <p>This is quite a pure node, since 97.8% of the observations belong to the same class ("Red"). Its Gini impurity measure is consequently very low. An alternative is to use the <i>Information gain</i> measure, based on the concept of <i>entropy</i> from information theory. In scikit-learn you can use this measure by instantiating the <code1>DecisionTreeClassifier</code1> with <code1>criterion='entropy'</code1> instead of <code1>'gini'</code1>.</p>
+        <p>This is quite a pure node, since 97.8% of the observations belong to the same class ("Red"). It correspnds to the lower left quadrant on the decision space plot above. Its Gini impurity measure is consequently very low. An alternative to Gini impurity is to use the <i>Information gain</i> measure, based on the concept of <i>entropy</i> from information theory. In scikit-learn you can use this measure by instantiating the <code1>DecisionTreeClassifier</code1> with <code1>criterion='entropy'</code1> instead of <code1>'gini'</code1>.</p>
 
         <p>Decision Trees have the ability to adapt very closely to the training data. They are <i>non-parametric models</i>, since the number of parameters is not predetermined and will thus grow during traning. This means that they have a tendency to produce high-variance models that will not generalize well to classification of new, previously unseen, instances. This is known as overfitting the training data. For this reason, regularization is very important when training Decision Tree models. Decision Trees have several regularization hyperparameters. Different implementations will, at the very least, allow you to constrain the tree depth. You may have noticed that I have used that above, by instantiating the <code1>DecisionTreeClassifier</code1> with argument <code1>max_depth=2</code1>. This was mainly to generate a small tree that was easy to visualize. The result was arguably an underfitting model that could be improved. Here is what it looks like using <code1>max_depth=3</code1>.</p>
 
@@ -289,9 +289,9 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
             <h4>2.1 Building an ensemble of Decision Trees</h4>
         </header>
 
-        <p>An ensemble of Decision Trees is called a <i>Random Forest</i>. Random Forests are an example of an ensemble using the same ML algorithm to build multiple models each trained on a different random subset of the training data. When the training data sampling for each predictor is performed with replacement, the method is called <i>Boosted aggregating</i>, commonly abbreviated to <i>Bagging</i>. Sampling without replacement is called <i>Pasting</i>. After growing the Random Forest, i.e. training the chosen number of Decision Trees, the individual Decision Trees vote to reach the final prediction. Voting can be done in two ways, called <i>hard voting</i> and <i>soft voting</i>. Hard voting consists using the statistical mode of the predicted classes, i.e. the most commonly predicted class. Soft voting consists on outputing the highest class probability, averaged over all the individual classifiers. This, of course, requires that the predictors can estimate class probabilities.</p>
+        <p>An ensemble of Decision Trees is called a <i>Random Forest</i>. Random Forests are an example of an ensemble using the same ML algorithm to build multiple models each trained on a different random subset of the training data. When the training data sampling for each predictor is performed with replacement, the method is called <i>Boosted aggregating</i>, commonly abbreviated to <i>Bagging</i>. Sampling without replacement is called <i>Pasting</i>. After growing the Random Forest, i.e. training the chosen number of Decision Trees, the individual Decision Trees vote to reach the final prediction. Voting can be done in two ways, called <i>hard voting</i> and <i>soft voting</i>. Hard voting consists on using the statistical mode of the predicted classes, i.e. the most commonly predicted class. Soft voting consists on outputing the highest class probability, averaged over all the individual classifiers. This, of course, requires that the predictors can estimate class probabilities.</p>
 
-        <p>The final result is typically a model with similar bias but a lower variance than a single Decision Tree trained on the same data. This means that the decision boundary is less irregular. Let's see what that looks like by using scikit-kearn's <code1>BaggingClassifier</code1> to grow a Random Forest. Let's grow, say, 50 Decision Trees, each trained on a random sample of 50 training set instances. scikit-learn also allows us to parallelize the work, with the <code1>n_jobs</code1> parameter. This is another nice side-effect of the algorithm: the individual predictors can be trained completely independently of each other. Let's set <code1>n_jobs=-1</code1>, which evaluates to the number of available cores.</p>
+        <p>The final result is typically a model with similar bias but a lower variance than a single Decision Tree trained on the same data. This means that the decision boundary is less irregular. Let's see what that looks like by using scikit-kearn's <code1>BaggingClassifier</code1> to grow a Random Forest. Let's grow, say, 50 Decision Trees, each trained on a random sample of 50 training set instances. scikit-learn also allows us to parallelize the work, with the <code1>n_jobs</code1> parameter. This is nice attribute of the algorithm: the individual predictors can be trained completely independently of each other, so it lends itself perfectly to computational parallelization. Let's set <code1>n_jobs=-1</code1>, which evaluates to the number of available cores.</p>
 
         <pre>
             <code class="language-python">
@@ -311,7 +311,7 @@ plot_feature_space(bag_clf, X, y, axes=[-16, 15, -20, 20])</code>
             <div class="8u"><span class="image fit"><img src="images/random_forests/bagging.png" alt="Bagging" /></span></div>
         </center>
 
-        <p>The decision boundaries look much smoother and definitely seem like they will generalize much better. An interesting side-effect of the bagging procedure is that a subset of the instances will not be sampled during training, the so-called <i>out-of-bag</i> instances. The model will not have seen the <i>out-of-bag</i> instances at all during training and so they can actually be used as a test set, in a procedure known as <i>Out-of-bag Evaluation</i>. Parameter <code1>oob_score=True</code1> above tells scikit-learn to perform Out-of-bag Evaluation after training and we can now use the attribute <code1>oob_score_</code1> to check the score.</p>
+        <p>The decision boundaries look much smoother and definitely seem like they will generalize much better. An interesting side-effect of the bagging procedure is that a subset of the instances will not be sampled during training, the so-called <i>out-of-bag</i> instances. The model will not have seen the out-of-bag instances at all during training and so they can actually be used as a test set, in a procedure known as <i>Out-of-bag Evaluation</i>. Parameter <code1>oob_score=True</code1> above tells scikit-learn to perform Out-of-bag Evaluation after training and we can now use the attribute <code1>oob_score_</code1> to check the score.</p>
 
         <pre>
             <code class="language-python">
@@ -325,7 +325,7 @@ Out-of-bag evaluation score: 91.0%</code></pre><br />
         <h4>2.2 The Random Forest Classifier class</h4>
         </header>
 
-        <p>As you may know, scikit-learn actually has a <code1>RandomForestClassifier</code1> class, so you can leave the bagging classifier class to use when you're bagging other models for your custom-built ensembles. This class will train a Random Forest using the specified number of Decision Trees using the whole training set for each individual model. One other main difference compared to the bagging classifier built above is that it introduces additional randomness by using a random subset of the features at each split, as well as a random subset of the data. This favors lower variance (and higher bias), helping with the tendency of the trees to overfit the data. Let's build a Random Forest with the <code1>RandomForestClassifier</code1> class and an additional regularization hyperparameter by setting <code1>max_leaf_nodes=10</code1>.</p>
+        <p>As you may know, scikit-learn actually has a <code1>RandomForestClassifier</code1> class, so you can leave the bagging classifier class to use when you're bagging other models for your custom-built ensembles. This class will train a Random Forest using the specified number of Decision Tree models. One important difference compared to the bagging classifier built above is that it introduces additional randomness by using a random subset of the features at each split, as well as a random subset of the data. This favors lower variance (and higher bias), helping with the tendency of the trees to overfit the data. Let's build a Random Forest with the <code1>RandomForestClassifier</code1> class and an additional regularization hyperparameter by setting <code1>max_leaf_nodes=10</code1>.</p>
 
         <pre>
             <code class="language-python">
@@ -385,7 +385,7 @@ Out-of-bag evaluation score: 92.0%</code></pre><br />
         
         <p>The decision boundaries look even more natural, right?</p>
 
-        <p>That's it for this overview of Random Forests. I hope this helped you get adeeper undrerstanding of Decision Trees, Ensemble Learning, and Random Forests.</p>
+        <p>That's it for this overview of Random Forests. I hope this helped you get a deeper understanding of Decision Trees, Ensemble Learning, and Random Forests.</p>
 
         </div>
   </section>
