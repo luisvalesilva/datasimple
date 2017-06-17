@@ -209,8 +209,8 @@ a <- Rpckg::triple(2476937509)</code>
 			</header>
 
 			<h4>Easy publishing</h4>
-			<p>Even if you're not planning on submitting your package to CRAN, you can still
-				publish and distribute it for easy installation by others. You are probably using
+            <p>Even if you're not planning on submitting it CRAN, you can still	publish and
+               distribute your package for easy installation by others. You are probably using
 				some kind of version control (if you are not, you should start now) and you can
 				leverage that to easily publish your package. <i>Git</i> is currently the most common
 				system and <i>devtools</i> provides functions to install packages directly from
@@ -239,6 +239,25 @@ setwd('location/of/your/package')
 staticdocs::build_site('Rpckg', '/website/location/', examples = FALSE)</code>
 	</pre></br>
 
+		<h5>Update</h5>
+		<p>There now exists a better alternative to <i>staticdocs</i>, also by Hadley Wickham, called
+        <a href="https://github.com/hadley/staticdocs"  target="_blank"><i>pkgdown</i></a>.
+        It is just as easy to use and more powerful than <i>staticdocs</i>. Be sure to go checkout all
+        the options it provides, but here's the minimal usage example. It is really similar to
+        <i>staticdocs</i>'s, but it will build the package found in the current directory by default
+        and put the output in a <code1>docs</code1> folder (which is created if not found) in the
+        package directory.
+        </p>
+
+	<pre>
+		<code class="language-r">
+# Grab the development version from GitHub
+devtools::install_github("hadley/pkgdown")
+# Navigate to package's parent directory and build site
+# (use 'examples = FALSE' if you don't want your examples to run)
+setwd('location/of/your/package')
+pkgdown::build_site()</code>
+	</pre></br>
 
 			<p>That's it. You have now created a fully functional R package and a slick
 				documentation website to go with it. There's a few other quick informal guides
