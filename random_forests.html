@@ -62,7 +62,7 @@
         <br />
         <p><i>Random Forests</i> are a popular example of an <i>Ensemble Learning</i> method. Ensemble Learning consists on combining multiple machine learning (ML) models in order to achieve higher predictive performance than could be obtained using either of the individual models alone. Ensemble Learning methods work best when the models are as diverse as possible, providing complementary predictive performance. One way to achieve this is to combine models built using different ML algorithms, to leverage their diverse strengths. An alternative approach is to use the same ML algorithm, but to train each model on a different random subset of the training data. This is the appproach taken by Random Forests: they combine multiple <i>Decision Tree</i> models trained on random subsets of the training data.</p>
           
-        <p>In this post I will start by taking a closer look at the Decision Tree ML algorithm and then discuss how you can combine different Decision Tree models to build Random Forests. But before moving on, however, let's generate some toy data using <a href="http://scikit-learn.org/stable/" target="_blank">scikit-learn</a>'s <code1>make_blobs</code1> function. Let's make it a two-dimensional data set, in order to allow easy visualization. There will be, say, 300 observations evenly split between three classes, "Yellow", "Blue", and "Red". I'll use a high-enough standard deviation (parameter <code1>cluster_std</code1>) to blur out the class boundaries a little bit.</p>
+        <p>In this post I will start by taking a closer look at the Decision Tree ML algorithm and then discuss how you can combine different Decision Tree models to build Random Forests. Before moving on, let's generate some toy data using <a href="http://scikit-learn.org/stable/" target="_blank">scikit-learn</a>'s <code1>make_blobs</code1> function. Let's make it a two-dimensional data set, to allow easy visualization. There will be, say, 300 observations evenly split between three classes, "Yellow", "Blue", and "Red". I'll use a high-enough standard deviation (parameter <code1>cluster_std</code1>) to blur out the class boundaries a little bit.</p>
 
         <pre>
             <code class="language-python">
@@ -108,12 +108,13 @@ tree_clf = DecisionTreeClassifier(max_depth=2, random_state=42)
 tree_clf.fit(X, y)</code>
         </pre></br>
 
-        <p>We have grown a tree on our 2-D data set. Classifying new examples is simple. Let's make up a couple of examples to try the classifier.</p>
+        <p>We have grown a tree on our 2-D data set. Classifying new observations is simple. Let's make up a couple of examples to try the classifier on.</p>
 
         <pre>
             <code class="language-python">
 import numpy as np
 
+# Define function to classify observations
 def predict_class(data_point, classes=['Yellow', 'Blue', 'Red']):
     # Convert to appropriate numpy array
     data_point = np.array(data_point).reshape(1, -1)
@@ -124,7 +125,8 @@ def predict_class(data_point, classes=['Yellow', 'Blue', 'Red']):
     # Print output
     print('Predicted class for point {}: {}'.format(data_point,
                                                     classes[np.asscalar(result)]))
-    
+
+# Classify some example observations
 predict_class([-5, 10])
 predict_class([10, 5])
 predict_class([-10, -10])</code>
@@ -184,7 +186,11 @@ def compute_decision_boundaries(clf, x, y, axes):
 
 def plot_feature_space(clf, x, y, axes, file_name=none):
     x1, x2, y_pred = compute_decision_boundaries(clf, x, y, axes)
-    custom_cmap = listedcolormap(['y','b','r']) plt.contourf(x1, x2, y_pred, cmap=custom_cmap, alpha=0.1, linewidth=1) plt.plot(x[:, 0][y==0], x[:, 1][y==0], "yo", marker='.') plt.plot(x[:, 0][y==1], x[:, 1][y==1], "bs", marker='.') plt.plot(x[:, 0][y==2], x[:, 1][y==2], "rd", marker='.')
+    custom_cmap = listedcolormap(['y','b','r'])
+    plt.contourf(x1, x2, y_pred, cmap=custom_cmap, alpha=0.1, linewidth=1)
+    plt.plot(x[:, 0][y==0], x[:, 1][y==0], "yo", marker='.')
+    plt.plot(x[:, 0][y==1], x[:, 1][y==1], "bs", marker='.')
+    plt.plot(x[:, 0][y==2], x[:, 1][y==2], "rd", marker='.')
     plt.axis(axes)
     plt.xlabel(r"$x_1$", fontsize=20)
     plt.ylabel(r"$x_2$", fontsize=20, rotation=0)
@@ -209,7 +215,7 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
             <h4>1.2 "Growing" a Decision Tree model</h4>
         </header>
 
-        <p>So this is how a Decision Tree model makes predictions. But how can we actually grow the tree? There are alternatives, but scikit-learn uses the <i>Classification And Regression Tree</i> (CART) algorithm. CART works by splitting the training set of \(m\) instances in two subsets using a single feature \(k\) and a threshold \(t_k\), such that the split produces the purest subsets (weighted by their size). This is called the <i>splitting rule</i>. It then splits the subsets in the same exact way, then the sub-subsets and so on, recursively, until it cannot find a split to reduce class impurity. This is known as contructing the <i>maximum tree</i>. The CART algorithm minimizes the following cost function at each split:</p>
+        <p>So this is how a Decision Tree model makes predictions. But how can we actually grow the tree? There are alternatives, but scikit-learn uses the <i>Classification And Regression Tree</i> (CART) algorithm. CART works by splitting the training set of \(m\) instances into two subsets using a single feature \(k\) and a threshold \(t_k\), such that the split produces the purest subsets (weighted by their size). This is called the <i>splitting rule</i>. It then splits the subsets in the same exact way, then the sub-subsets and so on, recursively, until it cannot find a split to reduce class impurity. This is known as contructing the <i>maximum tree</i>. The CART algorithm minimizes the following cost function at each split:</p>
 
         $$ J(k, t_k) = \dfrac{m_{left}}{m}I_{left} + \dfrac{m_{right}}{m}I_{right} $$
 
@@ -233,7 +239,7 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
         \end{cases}
         $$
 
-        <p>In other words, the Gini impurity measures the probability that a randomly chosen instance from the node would be incorrectly labeled if it was randomly labeled according to the distribution of classes in the node. It does this by first computing the probability \(p_{k,t}\) that a randomly chosen instance from the subset of training instances in the node \(t\) belongs to class \(k\) (simply the ratio of class \(k\) instances). It multiplies this probability by itself, which yields the probability \(p_{k,t}^2\) that that instance would be correctly labeled if it was randomly labeled according to the distribution of classes in the node (again, simply the ratio of class \(k\) instances). It then sums up the probabilities across all classes \(K\) and finally computes the probability that the instance would be incorrectly classified by subtracting the previous probability from the unity. The Gini impurity is thus reduced to zero when the node is pure, i.e. all instances in the node belong to the same class, since in that case \(p_{k,t} = 1\) for the represented class (and 0 for all others) and thus \(p_{k,t}^2 = 1\), resulting in \(I_G(t) = 1 - 1 = 0\).</p>
+        <p>In other words, the Gini impurity measures the probability that a randomly chosen instance from the node would be incorrectly labeled if it were randomly labeled according to the distribution of classes in the node. It does this by first computing the probability \(p_{k,t}\) that a randomly chosen instance from the subset of training instances in the node \(t\) belongs to class \(k\) (simply the ratio of class \(k\) instances). It multiplies this probability by itself, which yields the probability \(p_{k,t}^2\) that that instance would be correctly labeled if it were randomly labeled according to the distribution of classes in the node (again, simply the ratio of class \(k\) instances). It then sums up the probabilities across all classes \(K\) and finally computes the probability that the instance would be incorrectly classified by subtracting the previous probability from the unity. The Gini impurity is thus reduced to zero when the node is pure, i.e. all instances in the node belong to the same class, since in that case \(p_{k,t} = 1\) for the represented class (and 0 for all others) and thus \(p_{k,t}^2 = 1\), resulting in \(I_G(t) = 1 - 1 = 0\).</p>
 
         <p>You can now go back to the image of the tree structure and check the "gini" attribute at each node. Let's take, for example, the purple leaf node \(t=4\). Using the definition above, we can calculate the Gini impurity at this is node and get the indicated value of \(0.0425\):</p>
 
@@ -242,9 +248,9 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
         = 1 - ( 0 + 0.00047 + 0.95699 ) =\\
         = 0.0425 $$
 
-        <p>This is quite a pure node, since 97.8% of the observations belong to the same class ("Red"). It correspnds to the lower left quadrant on the decision space plot above. Its Gini impurity measure is consequently very low. An alternative to Gini impurity is to use the <i>Information gain</i> measure, based on the concept of <i>entropy</i> from information theory. In scikit-learn you can use this measure by instantiating the <code1>DecisionTreeClassifier</code1> with <code1>criterion='entropy'</code1> instead of <code1>'gini'</code1>.</p>
+        <p>This is quite a pure node, since 97.8% of the observations belong to the same class ("Red"). It corresponds to the lower left section of the decision space plot above. Its Gini impurity measure is consequently very low. An alternative to Gini impurity is to use the <i>Information gain</i> measure, based on the concept of <i>entropy</i> from information theory. In scikit-learn you can use this measure by instantiating the <code1>DecisionTreeClassifier</code1> with <code1>criterion='entropy'</code1> instead of <code1>'gini'</code1>.</p>
 
-        <p>Decision Trees have the ability to adapt very closely to the training data. They are <i>non-parametric models</i>, since the number of parameters is not predetermined and will thus grow during traning. This means that they have a tendency to produce high-variance models that will not generalize well to classification of new, previously unseen, instances. This is known as overfitting the training data. For this reason, regularization is very important when training Decision Tree models. Decision Trees have several regularization hyperparameters. Different implementations will, at the very least, allow you to constrain the tree depth. You may have noticed that I have used that above, by instantiating the <code1>DecisionTreeClassifier</code1> with argument <code1>max_depth=2</code1>. This was mainly to generate a small tree that was easy to visualize. The result was arguably an underfitting model that could be improved. Here is what it looks like using <code1>max_depth=3</code1>.</p>
+        <p>Decision Trees have the ability to adapt very closely to the training data. They are <i>non-parametric models</i>, since the number of parameters is not predetermined and will thus grow during training. This means that they have a tendency to produce high-variance models that will not generalize well to classification of new, previously unseen, instances. This is known as overfitting the training data. For this reason, regularization is very important when training Decision Tree models. Decision Trees have several regularization hyperparameters. Different implementations will, at the very least, allow you to constrain the tree depth. You may have noticed that I have used that above, by instantiating the <code1>DecisionTreeClassifier</code1> with argument <code1>max_depth=2</code1>. This was mainly to generate a small tree that was easy to visualize. The result was arguably an underfitting model that could be improved. Here is what it looks like using <code1>max_depth=3</code1>.</p>
 
         <pre>
             <code class="language-python">
@@ -280,7 +286,7 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
             <div class="7u"><span class="image fit"><img src="images/random_forests/unlimited.png" alt="Unconstrained" /></span></div>
         </center>
 
-        <p>Additional regularization parameters provided by scikit-learn are the minimum number of instances in a node before it can be split, the minimum number of instances in a leaf node, the maximum number of leaf nodes, and the maximum number of features that are evaluated for each split.</p>
+        <p>Additional regularization parameters provided by scikit-learn include the minimum number of instances in a node before it can be split, the minimum number of instances in a leaf node, the maximum number of leaf nodes, and the maximum number of features that are evaluated for each split.</p>
 
         <p>Decision Trees can also be used for regression problems, instead of classification, with very minor changes. The tree is grown in the same way, using the CART algorithm, except that instead of minimizing node impurity it minimizes the mean squared error (MSE). It then simply predicts the average value of all data observations at each node, instead of the most common class.</p>
 
@@ -289,7 +295,7 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
             <h4>2.1 Building an ensemble of Decision Trees</h4>
         </header>
 
-        <p>An ensemble of Decision Trees is called a <i>Random Forest</i>. Random Forests are an example of an ensemble using the same ML algorithm to build multiple models each trained on a different random subset of the training data. When the training data sampling for each predictor is performed with replacement, the method is called <i>Boosted aggregating</i>, commonly abbreviated to <i>Bagging</i>. Sampling without replacement is called <i>Pasting</i>. After growing the Random Forest, i.e. training the chosen number of Decision Trees, the individual Decision Trees vote to reach the final prediction. Voting can be done in two ways, called <i>hard voting</i> and <i>soft voting</i>. Hard voting consists on using the statistical mode of the predicted classes, i.e. the most commonly predicted class. Soft voting consists on outputing the highest class probability, averaged over all the individual classifiers. This, of course, requires that the predictors can estimate class probabilities.</p>
+        <p>An ensemble of Decision Trees is called a <i>Random Forest</i>. Random Forests are an example of ensemble modeling using the same ML algorithm to build multiple models each trained on a different random subset of the training data. When the training data sampling for each predictor is performed with replacement, the method is called <i>Boosted aggregating</i>, commonly abbreviated to <i>Bagging</i>. Sampling without replacement is called <i>Pasting</i>. After growing the Random Forest, i.e. training the chosen number of Decision Trees, the individual Decision Trees vote to reach the final prediction. Voting can be done in two ways, called <i>hard voting</i> and <i>soft voting</i>. Hard voting consists on using the statistical mode of the predicted classes, i.e. the most commonly predicted class. Soft voting consists on outputing the highest class probability, averaged over all the individual classifiers. This, of course, requires that the predictors be able to estimate class probabilities.</p>
 
         <p>The final result is typically a model with similar bias but a lower variance than a single Decision Tree trained on the same data. This means that the decision boundary is less irregular. Let's see what that looks like by using scikit-kearn's <code1>BaggingClassifier</code1> to grow a Random Forest. Let's grow, say, 50 Decision Trees, each trained on a random sample of 50 training set instances. scikit-learn also allows us to parallelize the work, with the <code1>n_jobs</code1> parameter. This is nice attribute of the algorithm: the individual predictors can be trained completely independently of each other, so it lends itself perfectly to computational parallelization. Let's set <code1>n_jobs=-1</code1>, which evaluates to the number of available cores.</p>
 
@@ -325,7 +331,7 @@ Out-of-bag evaluation score: 91.0%</code></pre><br />
         <h4>2.2 The Random Forest Classifier class</h4>
         </header>
 
-        <p>As you may know, scikit-learn actually has a <code1>RandomForestClassifier</code1> class, so you can leave the bagging classifier class to use when you're bagging other models for your custom-built ensembles. This class will train a Random Forest using the specified number of Decision Tree models. One important difference compared to the bagging classifier built above is that it introduces additional randomness by using a random subset of the features at each split, as well as a random subset of the data. This favors lower variance (and higher bias), helping with the tendency of the trees to overfit the data. Let's build a Random Forest with the <code1>RandomForestClassifier</code1> class and an additional regularization hyperparameter by setting <code1>max_leaf_nodes=10</code1>.</p>
+        <p>As you may know, scikit-learn actually has a <code1>RandomForestClassifier</code1> class, so you can leave the bagging classifier class to use when you're bagging other models for your custom-built ensembles. This class will train a Random Forest using the specified number of Decision Tree models. One important difference compared to the bagging classifier built above is that it introduces additional randomness by using a random subset of the features at each split, as well as a random subset of the data. This favors lower variance (and higher bias), helping curb the tendency of the trees to overfit the data. Let's build a Random Forest with the <code1>RandomForestClassifier</code1> class and an additional regularization hyperparameter by setting <code1>max_leaf_nodes=10</code1>.</p>
 
         <pre>
             <code class="language-python">
