@@ -215,7 +215,7 @@ plot_feature_space(tree_clf, X, y, axes=[-16, 15, -20, 20])</code>
             <h4>1.2 "Growing" a Decision Tree model</h4>
         </header>
 
-        <p>So this is how a Decision Tree model makes predictions. But how can we actually grow the tree? There are alternatives, but scikit-learn uses the <i>Classification And Regression Tree</i> (CART) algorithm. CART works by splitting the training set of \(m\) instances into two subsets using a single feature \(k\) and a threshold \(t_k\), such that the split produces the purest subsets (weighted by their size). This is called the <i>splitting rule</i>. It then splits the subsets in the same exact way, then the sub-subsets and so on, recursively, until it cannot find a split to reduce class impurity. This is known as contructing the <i>maximum tree</i>. The CART algorithm minimizes the following cost function at each split:</p>
+        <p>So this is how a Decision Tree model makes predictions. But how can we actually grow the tree? There are alternatives, but scikit-learn uses the <i>Classification And Regression Tree</i> (CART) algorithm. CART works by splitting the training set of \(m\) instances into two subsets using a single feature \(k\) and a threshold \(t_k\), such that the split produces the purest subsets (weighted by their size). This is called the <i>splitting rule</i>. It then splits the subsets in the same exact way, then the sub-subsets and so on, recursively, until it cannot find a split to reduce class impurity. This is known as constructing the <i>maximum tree</i>. The CART algorithm minimizes the following cost function at each split:</p>
 
         $$ J(k, t_k) = \dfrac{m_{left}}{m}I_{left} + \dfrac{m_{right}}{m}I_{right} $$
 
